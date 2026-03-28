@@ -59,20 +59,22 @@ if exist "%DATA_DIR%\runtime\index.js" (
     goto :maybe_set_url
 )
 
-rem Run installer
+rem Run installer — pass DataDir and EnrollmentUrl so they are honoured
 echo   Installing GreenFrog...
 echo.
 set SCRIPT_DIR=%~dp0
-powershell -ExecutionPolicy Bypass -File "%SCRIPT_DIR%install.ps1"
+powershell -ExecutionPolicy Bypass -File "%SCRIPT_DIR%install.ps1" -DataDir "%DATA_DIR%" -EnrollmentUrl "%ENROLLMENT_URL%"
 if %errorlevel% neq 0 (
     echo.
     echo   Installation failed. See errors above.
     pause
     exit /b 1
 )
+rem Installer already wrote the URL to config; skip to launch
+goto :launch
 
 :maybe_set_url
-rem Write enrollment URL to config only if explicitly provided
+rem Write enrollment URL to config only if explicitly provided (already-installed path only)
 if not "%ENROLLMENT_URL%"=="" (
     powershell -NonInteractive -ExecutionPolicy Bypass -Command "Add-Content -Encoding UTF8 '%DATA_DIR%\config.ps1' \"`n`$env:GF_ENROLLMENT_URL = '%ENROLLMENT_URL%'\""
     echo   Enrollment URL configured: %ENROLLMENT_URL%

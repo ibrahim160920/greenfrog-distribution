@@ -121,9 +121,16 @@ Your organization's administrator will provide the enrollment URL.
 ### Migrating from Personal to Managed
 
 If you started in personal mode and later receive a managed distribution server URL, pass
-`--enrollment-url` on the command line. GreenFrog detects the migration intent, clears the
-personal credential, and completes remote enrollment. If remote enrollment fails, personal
-mode is automatically restored.
+`--enrollment-url` on the command line. GreenFrog detects the migration intent and:
+
+1. Clears only the personal credential, state, and local signing key
+2. **Preserves the install record** — your `instanceId` does not change
+3. Enrolls with the remote server using the same `instanceId`
+4. Saves the server-issued JWT credential (replaces the personal one)
+
+If remote enrollment fails, personal mode is automatically restored and the original
+`instanceId` remains in use. The migration is an atomic swap of credentials, not a
+re-installation.
 
 ---
 

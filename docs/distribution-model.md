@@ -16,10 +16,11 @@ It runs on your hardware, uses your credentials, and keeps your sessions local.
 
 A child instance:
 - Runs the GreenFrog agent loop, skill system, memory, and scheduler on your machine
-- Enrolls with a mother-body distribution server to receive a signed credential
+- Initializes its own local identity on first launch — no server required for personal use
+- Optionally enrolls with a mother-body distribution server to receive signed capability
+  updates and contribute to the governed backflow pipeline
 - Periodically checks for capability updates (inheritance bundles) and applies them after
-  verification
-- May contribute anonymized experience data back to the distribution system (backflow)
+  verification (when connected to a distribution server)
 - Does not directly communicate with other child instances
 
 ### The Mother Body (Not Publicly Distributed)
@@ -84,26 +85,45 @@ rollback instructions.
 
 ## Enrollment
 
-**Enrollment is required.** A child instance cannot receive capability updates or contribute
-backflow data without first enrolling with a distribution server.
+### Personal Mode (Default)
 
-Enrollment establishes:
+**No server required.** On first launch, GreenFrog automatically initializes its own local
+identity without contacting any external server:
+
+1. A unique instance ID is generated and stored in `~/.greenfrog/identity/`
+2. A local HMAC signing key is created
+3. A self-signed JWT credential is issued — valid indefinitely, locally verifiable
+4. The instance transitions to `enrolled` state and starts immediately
+
+This is the default for individual users. You do not need an enrollment URL, an account, or
+any network access to get started.
+
+### Managed Mode (Optional — Organizations)
+
+If you connect GreenFrog to a managed distribution server, enrollment establishes:
 1. A unique instance identity (generated locally on first launch)
-2. A signed JWT credential from the distribution server
-3. The authenticated channel used for all subsequent distribution operations
+2. A signed JWT credential issued by the distribution server
+3. The authenticated channel used for inheritance (capability updates) and backflow
 
-Enrollment is automatic: set `GF_ENROLLMENT_URL` in your config file and launch GreenFrog.
-The process completes in one network round-trip without any manual key entry.
+Managed enrollment is automatic: pass the server URL at launch and GreenFrog completes
+enrollment in one network round-trip without any manual key entry.
 
-**Why enrollment cannot be skipped:**
+```bash
+# Linux / macOS — pass at launch (one-time)
+greenfrog --enrollment-url https://your-server.example.com/api/distribution/enroll
 
-- The JWT is the only authentication mechanism for inheritance and backflow endpoints
-- Without enrollment, the distribution server has no record of your instance and will not
-  serve signed bundles to it
-- Enrollment is a one-time operation — not a recurring login
+# Or set permanently in ~/.greenfrog/config.sh:
+export GF_ENROLLMENT_URL="https://your-server.example.com/api/distribution/enroll"
+```
 
-Enrollment URL and any required access code are provided by your organization's
-administrator alongside the distribution package.
+Your organization's administrator will provide the enrollment URL.
+
+### Migrating from Personal to Managed
+
+If you started in personal mode and later receive a managed distribution server URL, pass
+`--enrollment-url` on the command line. GreenFrog detects the migration intent, clears the
+personal credential, and completes remote enrollment. If remote enrollment fails, personal
+mode is automatically restored.
 
 ---
 
@@ -181,6 +201,21 @@ included in a child distribution.
 ## Summary Diagram
 
 ```
+Personal mode (default — no server needed):
+
+           ┌────────────────────────────────┐
+           │        Child Instance          │
+           │  (your machine)                │
+           │                               │
+           │  Local identity self-init      │
+           │  Agent loop + Skills + Memory  │
+           │  Scheduler + Workflows         │
+           │  ~/.greenfrog/                 │
+           └────────────────────────────────┘
+
+
+Managed mode (optional — organizations):
+
 ┌──────────────────────────────────────────────────────────┐
 │                      Mother Body                         │
 │  (private — not distributed)                             │
@@ -205,6 +240,6 @@ included in a child distribution.
            └────────────────────────────────┘
 ```
 
-The GitHub distribution repository sits to the right of this diagram — a read-only artifact
-store from which your installer downloads the initial package. The trust chain runs through
-the signed manifests and the public key, not through GitHub.
+The GitHub distribution repository is a read-only artifact store from which your installer
+downloads the initial package. The trust chain runs through the signed manifests and the
+public key, not through GitHub.

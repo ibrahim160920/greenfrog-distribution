@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "releaseId": "27c5ff59-cdbb-484a-bd0f-ed048570d1fc",
+  "releaseId": "5788e880-9962-4ed9-9bf9-6784a791c8b5",
   "version": "1.4.0",
-  "releasedAt": "2026-03-28T17:24:24.662Z",
+  "releasedAt": "2026-03-28T17:41:49.757Z",
   "compatibilityConstraint": ">=1.4.0",
   "bundleType": "mother_promoted",
-  "bundleHash": "27c26617ba503fd55017ee012ed3fd8ff03fad1e6d7832f9f318a967b3676159",
-  "bundleSize": 2082314,
-  "downloadUrl": "https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/windows/greenfrog-v1.4.0-windows.zip",
+  "bundleHash": "a32637d8566d375662c64b114581abf9165411e346da8556923239edad3f3141",
+  "bundleSize": 7885228,
+  "downloadUrl": "https://distribution.greenfrog.example.com/v1.4.0/greenfrog-v1.4.0-windows.zip",
   "keyId": "c4ba4d8eeeb0ec21",
-  "signature": "xpib6-hOivuu13cJo-_UPR9E-OeM9-QjJErvN6D9aIRK9pGWP5lBZrGySvCjLSxT6QgzQa0NVgtQcakSUXg1BQ"
+  "signature": "YnLHiJmcSq6G2PAadZryCPqIHUau1H9KbPyarKxUE8ozllAi0Z08EtgjrUfokF70YaInx5l16-iYsu__DrnoBA"
 }

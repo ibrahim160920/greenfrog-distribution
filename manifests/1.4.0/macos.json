@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "releaseId": "e1684daf-3684-469d-9226-2d7884c78b11",
+  "releaseId": "1936071a-e266-4982-8b03-7abbf66f7763",
   "version": "1.4.0",
-  "releasedAt": "2026-03-28T15:16:39.025Z",
+  "releasedAt": "2026-03-28T17:24:24.538Z",
   "compatibilityConstraint": ">=1.4.0",
   "bundleType": "mother_promoted",
-  "bundleHash": "97b801d4b55f7a812e8595d4f8524b073785b590db8d54af20be9dd3a8e40d52",
-  "bundleSize": 1857171,
-  "downloadUrl": "https://github.com/ibrahim160920/greenfrog-distribution/releases/download/v1.4.0/greenfrog-v1.4.0-macos.tar.gz",
+  "bundleHash": "051f9eed2f0c3cf4dc4b7d4c37a71a72349c2a29ab6883b86c78348be0a6344e",
+  "bundleSize": 1857449,
+  "downloadUrl": "https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/macos/greenfrog-v1.4.0-macos.tar.gz",
   "keyId": "c4ba4d8eeeb0ec21",
-  "signature": "JTLKzziZhxkO-oIxc-c7gFkZCXevPkPqeAPOK3TZBfeD6e-ZRqGohzRBEmCs_w6S80iosWr0m64fIM5t1TPgDw"
+  "signature": "Xx80Fc91PG-WR0B-Zcx1joZBZeapeNRpkRyhGq-tSHX-VN1V08I0hnoYosjFjtrqlXS5FtlmNgUQFKJiXPKjBg"
 }

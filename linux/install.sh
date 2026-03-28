@@ -128,20 +128,23 @@ if [ ! -f "$CONFIG_FILE" ]; then
     cp "$TEMPLATE" "$CONFIG_FILE"
   else
     cat > "$CONFIG_FILE" <<'CONF'
-# GreenFrog Child Instance Configuration
+# GreenFrog Configuration
+# Personal mode is the default — no server configuration required.
+# GreenFrog runs locally and initializes its own identity on first launch.
+#
+# To connect to a managed distribution server (organizations / advanced use):
 # export GF_ENROLLMENT_URL="https://your-server.example.com/api/distribution/enroll"
 # export GF_DISTRIBUTION_URL="https://your-server.example.com"
+#
 # export GF_LOCALE=""  # Leave unset to auto-detect system locale
 CONF
   fi
   echo "  Config created at: $CONFIG_FILE"
 fi
 
-# Write enrollment URL if provided via --enrollment-url
+# Write enrollment URL if provided via --enrollment-url (optional; only for managed deployments)
 if [ -n "$ENROLLMENT_URL" ]; then
-  # Remove any existing GF_ENROLLMENT_URL line and append the new one
   if grep -q 'GF_ENROLLMENT_URL' "$CONFIG_FILE" 2>/dev/null; then
-    # Replace the existing line (commented or not)
     sed -i "s|.*GF_ENROLLMENT_URL.*|export GF_ENROLLMENT_URL=\"$ENROLLMENT_URL\"|" "$CONFIG_FILE"
   else
     echo "" >> "$CONFIG_FILE"
@@ -191,15 +194,20 @@ else
 fi
 echo
 echo "  Next steps:"
-
+echo
 if [ -n "$ENROLLMENT_URL" ]; then
-  echo "    Enrollment URL is set. Run: greenfrog"
-  echo "    GreenFrog will complete enrollment automatically on first launch."
+  echo "    Enrollment URL configured. GreenFrog will connect to your server on first launch."
+  echo "    Run: greenfrog"
 else
-  echo "    1. Set your enrollment URL (provided by your administrator):"
-  echo "       Run: greenfrog --enrollment-url https://your-server/api/distribution/enroll"
-  echo "       Or edit: $CONFIG_FILE"
-  echo "    2. Then run: greenfrog"
+  echo "    GreenFrog is ready. Run it now:"
+  echo
+  echo "      greenfrog"
+  echo
+  echo "    On first launch, GreenFrog initializes its local identity automatically."
+  echo "    No server configuration is required for personal use."
+  echo
+  echo "    For managed/organization deployments, set your server URL:"
+  echo "      greenfrog --enrollment-url https://your-server/api/distribution/enroll"
 fi
 echo
 echo "$SEP"

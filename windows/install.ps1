@@ -118,9 +118,14 @@ if (-not (Test-Path $configFile)) {
         Copy-Item -Force $templatePath $configFile
     } else {
         @'
-# GreenFrog Child Instance Configuration
+# GreenFrog Configuration
+# Personal mode is the default -- no server configuration required.
+# GreenFrog runs locally and initializes its own identity on first launch.
+#
+# To connect to a managed distribution server (organizations / advanced use):
 # $env:GF_ENROLLMENT_URL = "https://your-server.example.com/api/distribution/enroll"
 # $env:GF_DISTRIBUTION_URL = "https://your-server.example.com"
+#
 # $env:GF_LOCALE = ""  # Leave unset to auto-detect system locale
 '@ | Set-Content -Encoding UTF8 $configFile
     }
@@ -161,12 +166,12 @@ Write-Host
 $bootstrapPath = Join-Path $BinDir "bootstrap.bat"
 @"
 @echo off
-rem GreenFrog Bootstrap -- Guided First-Run Setup
-rem Double-click this file to configure and start GreenFrog.
-title GreenFrog Setup
+rem GreenFrog Bootstrap -- First-Run Launcher
+rem Double-click this file to start GreenFrog.
+title GreenFrog
 
 echo ============================================================
-echo   GreenFrog -- First-Run Setup
+echo   GreenFrog
 echo ============================================================
 echo.
 
@@ -180,39 +185,12 @@ if not exist "%CONFIG_FILE%" (
     exit /b 1
 )
 
-rem Check if enrollment URL is already configured
-powershell -NonInteractive -ExecutionPolicy Bypass -Command "& { . '%CONFIG_FILE%'; if (\$env:GF_ENROLLMENT_URL) { exit 0 } else { exit 1 } }" >nul 2>&1
-if %errorlevel% == 0 (
-    echo   Enrollment URL is already configured.
-    goto :launch
-)
-
-echo   Your enrollment URL is the address of your GreenFrog server.
-echo   It looks like: https://your-server.example.com/api/distribution/enroll
-echo   Your administrator will provide this URL.
+echo   Starting GreenFrog...
+echo   On first launch, local identity is initialized automatically.
+echo   No server configuration required for personal use.
 echo.
-set /p ENROLLMENT_URL="  Enter enrollment URL: "
-
-if "%ENROLLMENT_URL%" == "" (
-    echo.
-    echo   No URL entered. You can set it later by editing:
-    echo   %CONFIG_FILE%
-    echo.
-    pause
-    exit /b 0
-)
-
-rem Write the URL to config
-powershell -NonInteractive -ExecutionPolicy Bypass -Command "Add-Content -Encoding UTF8 '%CONFIG_FILE%' \"`n`$env:GF_ENROLLMENT_URL = '%ENROLLMENT_URL%'\""
-echo.
-echo   Enrollment URL saved.
 
 :launch
-echo.
-echo ============================================================
-echo   Starting GreenFrog...
-echo ============================================================
-echo.
 call "%DATA_DIR%\bin\greenfrog.bat"
 "@ | Set-Content -Encoding ASCII $bootstrapPath
 Write-Host "  Bootstrap created: $bootstrapPath"
@@ -245,18 +223,19 @@ Write-Host
 Write-Host "  Next steps:"
 
 if ($EnrollmentUrl) {
-    Write-Host "    Enrollment URL is set. Open a new terminal and run: greenfrog"
-    Write-Host "    GreenFrog will complete enrollment automatically on first launch."
+    Write-Host "    Enrollment URL configured. GreenFrog will connect to your server on first launch."
+    Write-Host "    Open a new terminal and run: greenfrog"
 } else {
-    Write-Host "    Option A (guided setup):"
+    Write-Host "    GreenFrog is ready. Start it now:"
+    Write-Host
     Write-Host "      Double-click: $bootstrapPath"
+    Write-Host "      Or open a new terminal and run: greenfrog"
     Write-Host
-    Write-Host "    Option B (command line):"
-    Write-Host "      Open a new terminal and run:"
-    Write-Host "      greenfrog.bat (or greenfrog after restarting terminal)"
+    Write-Host "    On first launch, GreenFrog initializes its local identity automatically."
+    Write-Host "    No server configuration is required for personal use."
     Write-Host
-    Write-Host "    To set enrollment URL manually, edit:"
-    Write-Host "      $configFile"
+    Write-Host "    For managed/organization deployments, run:"
+    Write-Host "      greenfrog --enrollment-url https://your-server/api/distribution/enroll"
 }
 Write-Host
 Write-Host $SEP

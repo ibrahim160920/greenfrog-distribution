@@ -61,17 +61,13 @@ bash install.sh
 
 For Windows: extract the `.zip` and run `bootstrap.bat` (guided) or `install.ps1`.
 
-**Step 3 — Configure and start**
+**Step 3 — Start**
 
 ```bash
-# Edit ~/.greenfrog/config.sh and set your enrollment URL:
-export GF_ENROLLMENT_URL="https://your-server.example.com/api/distribution/enroll"
-
-# Then launch:
 greenfrog
 ```
 
-On first launch, GreenFrog enrolls automatically and begins normal operation.
+On first launch, GreenFrog initializes its local identity automatically — no server or configuration required for personal use.
 See [Installation Guide](docs/install.md) for full details, troubleshooting, and Windows instructions.
 
 ---
@@ -136,10 +132,13 @@ This contribution goes through a governed review process. Your data is **not** d
 shared with other users' instances, and other users' raw experience does not directly
 enter your instance.
 
-**Enrollment is required.** GreenFrog child instances must enroll with a distribution
-server before entering normal operation. Enrollment is automatic on first launch once
-you set the enrollment URL. This is not optional — it is how the trust and update
-channel is established.
+**Personal mode runs without a server.** For individual users, GreenFrog initializes
+its own local identity on first launch — no server URL required. The runtime starts
+and operates fully offline from any distribution server.
+
+**Remote enrollment is optional.** If you connect GreenFrog to a managed distribution
+server (organization deployments), enrollment is automatic once the server URL is configured.
+This enables signed capability updates and governed backflow.
 
 Full explanation: [docs/distribution-model.md](docs/distribution-model.md)
 
@@ -188,11 +187,14 @@ The Ed25519 signing key (held offline by the operator) is the real trust root. V
 the signature confirms the release was authorized by the key holder, independent of
 GitHub's integrity.
 
-**Why is enrollment required? Can I use GreenFrog offline?**
-Enrollment establishes the authenticated channel for receiving signed updates and
-contributing governed experience data. A GreenFrog instance without enrollment will
-start but will not receive capability updates or participate in the backflow channel.
-Purely offline operation is possible after enrollment but is not the intended use case.
+**Do I need a server to use GreenFrog?**
+No. GreenFrog runs in personal mode by default — it initializes its own local identity
+on first launch and starts immediately without any server. No enrollment URL, no
+account, no external service required.
+
+If you connect to a managed distribution server (optional, for organizations), you gain
+signed capability updates and governed experience sharing. That connection is established
+with a single `--enrollment-url` flag and is entirely optional.
 
 **Will my local data be shared with other users automatically?**
 No. Your local sessions, conversations, and workspace data are not directly shared with

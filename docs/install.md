@@ -1,4 +1,4 @@
-# GreenFrog Child Runtime — Installation Guide
+# GreenFrog — Installation Guide
 
 ## System Requirements
 
@@ -35,6 +35,13 @@ cd greenfrog-vX.Y.Z-linux/
 
 # 2. Run the installer
 bash install.sh
+
+# 3. Add to PATH (one-time)
+echo 'export PATH="$HOME/.greenfrog/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# 4. Start GreenFrog
+greenfrog
 ```
 
 The installer creates `~/.greenfrog/` with the following layout:
@@ -43,19 +50,13 @@ The installer creates `~/.greenfrog/` with the following layout:
 ~/.greenfrog/
 ├── runtime/        ← Node.js application files
 ├── bin/
-│   └── greenfrog   ← Launch wrapper (add this dir to PATH)
+│   └── greenfrog   ← Launch wrapper
 ├── logs/
 ├── identity/       ← Created on first launch
 ├── backflow/       ← Created on first launch
 ├── inheritance/    ← Created on first launch
-├── config.sh       ← Edit this before first launch
+├── config.sh       ← Optional: advanced configuration
 └── public-key.pem  ← Manifest signature verification key
-```
-
-Add the launcher to your PATH (add to `~/.bashrc` or `~/.zshrc`):
-
-```sh
-export PATH="$HOME/.greenfrog/bin:$PATH"
 ```
 
 ### macOS
@@ -67,89 +68,54 @@ cd greenfrog-vX.Y.Z-macos/
 
 # 2. Run the installer
 bash install.sh
-```
 
-Layout is identical to Linux. The installer detects your shell and prints the
-exact command to add `~/.greenfrog/bin` to PATH for either `zsh` or `bash`.
+# 3. Add to PATH (one-time — the installer prints the exact command)
+echo 'export PATH="$HOME/.greenfrog/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# 4. Start GreenFrog
+greenfrog
+```
 
 ### Windows
 
 ```powershell
-# Extract the .zip bundle, then open PowerShell in the extracted folder:
+# Extract the .zip bundle, then double-click bootstrap.bat
+# Or from PowerShell:
 powershell -File install.ps1
 ```
 
 The installer creates `%APPDATA%\GreenFrog\` and adds
-`%APPDATA%\GreenFrog\bin` to your user PATH automatically. Open a new
-terminal after installation for the PATH change to take effect.
+`%APPDATA%\GreenFrog\bin` to your user PATH automatically.
+Open a new terminal after installation for the PATH change to take effect.
+
+Then run:
+```
+greenfrog
+```
+(or double-click `bootstrap.bat`)
 
 ---
 
-## Setting the Enrollment URL
+## First Launch
 
-Before first launch you must set the enrollment URL. This is the address of
-your organization's GreenFrog mother-body server.
+On first launch, GreenFrog:
 
-**Linux / macOS** — edit `~/.greenfrog/config.sh`:
-```sh
-export GF_ENROLLMENT_URL="https://your-server.example.com/api/distribution/enroll"
-export GF_DISTRIBUTION_URL="https://your-server.example.com"
-```
+1. Generates a unique local identity (stored in `~/.greenfrog/identity/`)
+2. Creates a locally-signed credential
+3. Starts the agent runtime at `http://localhost:18889`
+4. Opens the web interface in your browser
 
-**Windows** — edit `%APPDATA%\GreenFrog\config.ps1`:
-```powershell
-$env:GF_ENROLLMENT_URL = "https://your-server.example.com/api/distribution/enroll"
-$env:GF_DISTRIBUTION_URL = "https://your-server.example.com"
-```
-
-The enrollment URL and any required access code are provided by your
-organization's administrator with your distribution package.
-
----
-
-## First Boot and Automatic Enrollment
-
-Once the enrollment URL is set, run `greenfrog` (or `greenfrog.bat` on
-Windows). On first launch the runtime automatically:
-
-1. Generates a unique instance identity (never sent in plaintext)
-2. Contacts the enrollment endpoint
-3. Receives a signed JWT credential
-4. Saves the credential locally
-5. Begins normal operation
-
-No typing or copy-pasting of keys is required. Enrollment is completed in
-one network round-trip. If enrollment fails (server unreachable, incorrect
-URL), the process exits with an error message — simply correct the config
-and run again.
-
----
-
-## Manual Enrollment
-
-If you prefer to enroll from the command line without the launcher:
-
-```sh
-# Linux / macOS
-node ~/.greenfrog/runtime/index.js --enroll --url https://your-server.example.com/api/distribution/enroll
-
-# Windows
-node "%APPDATA%\GreenFrog\runtime\index.js" --enroll --url https://your-server.example.com/api/distribution/enroll
-```
-
-Or use the enroll script (if bundled):
-```sh
-node scripts/enroll.js --url https://your-server.example.com/api/distribution/enroll
-```
+**No server configuration is required.** GreenFrog runs in personal mode by
+default — it initializes itself locally and starts immediately.
 
 ---
 
 ## Verifying Installation
 
-After enrollment you can verify the installation status:
+After the first successful launch, you can check the runtime status:
 
 ```sh
-# Check enrollment state and runtime info
 curl http://localhost:18889/api/distribution/status
 ```
 
@@ -166,17 +132,13 @@ Expected response:
 }
 ```
 
-If `enrollmentState` is `unregistered`, enrollment has not completed — check
-your `GF_ENROLLMENT_URL` setting and re-run the launcher.
-
 ---
 
-## Bundle Verification (optional)
+## Bundle Verification (optional but recommended)
 
 All distribution bundles include a SHA-256 checksum file, a signed manifest,
-and a standalone verification tool. The public key (`public-key.pem`) is the
-**trust root** — it is distributed with every package and is what makes the
-signature chain meaningful.
+and a standalone verification tool. Verification confirms the bundle was
+produced and authorized by the GreenFrog operator.
 
 ```sh
 # Verify checksum (Linux / macOS)
@@ -193,11 +155,10 @@ node tools/verify-release.js \
   --public-key public-key.pem
 ```
 
-**Important:** The GitHub distribution repository is a delivery mechanism,
-not a trust anchor. The Ed25519 public key (`public-key.pem`) is the trust
-root. A valid signature proves the release was authorized by the operator who
-holds the corresponding private key. See `docs/signature-verification.md` for
-manual verification steps.
+Expected output: `VERIFIED` with key ID `c4ba4d8eeeb0ec21`.
+
+The public key (`public-key.pem`) is the trust root — not the GitHub repository.
+See [docs/signature-verification.md](signature-verification.md) for manual steps.
 
 ---
 
@@ -205,16 +166,6 @@ manual verification steps.
 
 ### "Node.js is not installed" or version too old
 Install or upgrade Node.js to version 22 or later. See System Requirements above.
-
-### "GF_ENROLLMENT_URL is not set"
-Edit `~/.greenfrog/config.sh` (Linux/macOS) or `%APPDATA%\GreenFrog\config.ps1`
-(Windows) and set the `GF_ENROLLMENT_URL` variable. Obtain the URL from your
-organization's administrator.
-
-### "Enrollment failed: connection refused" or network error
-- Confirm the server address is correct
-- Check that the server is reachable: `curl https://your-server.example.com/api/distribution/status`
-- Confirm your firewall allows outbound HTTPS (port 443) to the server
 
 ### "permission denied" on Linux/macOS
 ```sh
@@ -226,14 +177,44 @@ The `bin/` directory is not on your PATH. Add it:
 ```sh
 export PATH="$HOME/.greenfrog/bin:$PATH"
 ```
-Then add this line permanently to your shell profile (`~/.bashrc` or `~/.zshrc`).
+Add this line permanently to your shell profile (`~/.bashrc` or `~/.zshrc`).
 
 ### SQLite lock error on startup
-Another GreenFrog process is running. Stop all running instances:
+Another GreenFrog process is already running. Stop all running instances:
 ```sh
 pkill -f greenfrog   # Linux / macOS
 ```
 Then retry.
+
+### "index.js not found in runtime bundle"
+The bundle was incomplete or extracted incorrectly. Re-download and re-extract.
+
+---
+
+## Connecting to a Managed Server (Organizations)
+
+For organization deployments where a central GreenFrog distribution server
+provides signed capability updates and governed data sharing:
+
+```sh
+# Linux / macOS: pass the URL at launch (one-time)
+greenfrog --enrollment-url https://your-server.example.com/api/distribution/enroll
+
+# Or set permanently in ~/.greenfrog/config.sh:
+export GF_ENROLLMENT_URL="https://your-server.example.com/api/distribution/enroll"
+export GF_DISTRIBUTION_URL="https://your-server.example.com"
+```
+
+```powershell
+# Windows: in %APPDATA%\GreenFrog\config.ps1:
+$env:GF_ENROLLMENT_URL = "https://your-server.example.com/api/distribution/enroll"
+$env:GF_DISTRIBUTION_URL = "https://your-server.example.com"
+```
+
+Once the enrollment URL is set, GreenFrog connects and enrolls automatically
+on the next launch — no further configuration required.
+
+Your organization's administrator will provide the enrollment URL.
 
 ---
 
@@ -261,43 +242,21 @@ $p = ($p -split ";" | Where-Object { $_ -notlike "*GreenFrog*" }) -join ";"
 
 ---
 
-## Security Model — Why Enrollment Cannot Be Skipped
-
-Every child instance must register with the mother-body server before
-entering normal operation. This is not optional for the following reasons:
-
-1. **Identity**: The server issues a signed JWT tied to a unique instance ID.
-   Without it the child cannot authenticate to any distribution endpoint.
-2. **Credential binding**: The JWT is the only authentication mechanism for
-   the inheritance and backflow APIs. There is no local-only mode.
-3. **Integrity**: The enrollment handshake confirms the server has a matching
-   record for this instance, preventing unauthorized instances from consuming
-   updates or sending backflow data.
-
-Enrollment is a one-time, automatic operation — it does not require any user
-interaction beyond setting the enrollment URL.
-
----
-
 ## What Is and Is Not in the Package
 
-### Included in every child package
+### Included in every distribution bundle
 - GreenFrog Node.js runtime (`runtime/`)
-- Distribution identity and enrollment subsystem
+- Distribution identity subsystem (local and remote enrollment)
 - Inheritance (update) client
 - Backflow (telemetry) client
-- Distribution server routes (for local API access)
 - Public key for manifest verification (`public-key.pem`)
 - Platform-specific installer script
-- Config template
+- Config template (all fields optional for personal use)
 
 ### NOT included (mother-body only)
-- Packaging and signing infrastructure (`scripts/package-child.js`, `sign-manifest.js`)
-- Mother private signing key (`keys/mother-private.pem`)
-- OwnerKernel, TrustedSelector, CapabilityUnit (internal capability promotion modules)
+- Packaging and signing infrastructure
+- Mother private signing key
+- Internal capability promotion and governance modules
 - Evolution scheduler and source repository sync
-- Any module matching the pattern `mother_*`, `evolution_*`, `source_repo_*`, `owner_kernel*`
 
-The absence of mother-only modules is verified by `scripts/package-child.js` at
-build time (exits with code 2 on any violation) and by `build-child-release.js`
-at release time (security audit step).
+The absence of mother-only modules is verified at build time.

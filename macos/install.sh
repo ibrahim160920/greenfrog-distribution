@@ -49,13 +49,13 @@ echo "  GreenFrog — Child Runtime Installer (macOS)"
 echo "$SEP"
 echo
 
-# ── Step 1: Check Node.js >= 18 ───────────────────────────────────────────────
+# ── Step 1: Check Node.js >= 22 ───────────────────────────────────────────────
 echo "  Checking Node.js..."
 if ! command -v node >/dev/null 2>&1; then
   echo
   echo "  ERROR: Node.js is not installed."
   echo
-  echo "  Install Node.js 18 or later — choose one:"
+  echo "  Install Node.js 22 or later — choose one:"
   echo
   echo "    Homebrew (recommended):"
   echo "      brew install node"
@@ -70,9 +70,9 @@ fi
 
 NODE_VERSION=$(node --version | sed 's/v//')
 NODE_MAJOR=$(echo "$NODE_VERSION" | cut -d. -f1)
-if [ "$NODE_MAJOR" -lt 18 ]; then
+if [ "$NODE_MAJOR" -lt 22 ]; then
   echo
-  echo "  ERROR: Node.js $NODE_VERSION detected. Version 18 or later is required."
+  echo "  ERROR: Node.js $NODE_VERSION detected. Version 22 or later is required."
   echo "  Upgrade: brew upgrade node  or  https://nodejs.org/en/download/"
   echo
   exit 1

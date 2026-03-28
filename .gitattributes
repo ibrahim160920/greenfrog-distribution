@@ -1,0 +1,31 @@
+# GreenFrog Public Distribution — Git Attributes
+# Enforces LF line endings for all text files in the distribution repo.
+# This prevents CRLF/LF drift on Windows and ensures consistent diffs.
+
+# Default: auto-detect text files and normalize to LF
+* text=auto eol=lf
+
+# Explicit text formats → always LF
+*.md        text eol=lf
+*.json      text eol=lf
+*.sh        text eol=lf
+*.js        text eol=lf
+*.ts        text eol=lf
+*.pem       text eol=lf
+*.txt       text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+
+# Windows-specific scripts → CRLF on checkout (required by Windows tooling)
+*.bat       text eol=crlf
+*.ps1       text eol=crlf
+*.cmd       text eol=crlf
+
+# Binary files — no line ending conversion
+*.tar.gz    binary
+*.zip       binary
+*.gz        binary
+*.png       binary
+*.jpg       binary
+*.ico       binary
+*.sig       binary

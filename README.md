@@ -31,7 +31,15 @@ by your instance before being applied. Your sessions and data stay local.
 **Step 1 — Download and verify**
 
 ```bash
-# Linux / macOS
+# One-step: download the latest bundle for your platform (Linux / macOS)
+curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/tools/download-latest.js
+node download-latest.js                  # auto-detects your platform
+```
+
+Or download a specific version manually:
+
+```bash
+# Linux / macOS — specific version
 curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/linux/greenfrog-v1.4.0-linux.tar.gz
 curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/manifests/1.4.0/linux.json
 curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/tools/verify-release.js

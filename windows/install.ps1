@@ -36,14 +36,14 @@ Write-Host "  GreenFrog -- Child Runtime Installer (Windows)"
 Write-Host $SEP
 Write-Host
 
-# ── Step 1: Check Node.js >= 18 ───────────────────────────────────────────────
+# ── Step 1: Check Node.js >= 22 ───────────────────────────────────────────────
 Write-Host "  Checking Node.js..."
 $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
 if (-not $nodeCmd) {
     Write-Host
     Write-Host "  ERROR: Node.js is not installed."
     Write-Host
-    Write-Host "  Install Node.js 18 or later — choose one:"
+    Write-Host "  Install Node.js 22 or later — choose one:"
     Write-Host
     Write-Host "    winget (recommended, open a terminal and run):"
     Write-Host "      winget install OpenJS.NodeJS.LTS"
@@ -55,9 +55,9 @@ if (-not $nodeCmd) {
 
 $nodeVersion = (node --version).TrimStart('v')
 $nodeMajor   = [int]($nodeVersion.Split('.')[0])
-if ($nodeMajor -lt 18) {
+if ($nodeMajor -lt 22) {
     Write-Host
-    Write-Host "  ERROR: Node.js $nodeVersion detected. Version 18 or later is required."
+    Write-Host "  ERROR: Node.js $nodeVersion detected. Version 22 or later is required."
     Write-Host "  Upgrade: winget upgrade OpenJS.NodeJS  or  https://nodejs.org/en/download/"
     Write-Host
     exit 1

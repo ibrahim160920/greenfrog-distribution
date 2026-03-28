@@ -31,6 +31,20 @@ Signed manifests are in `manifests/1.4.0/`:
 
 ---
 
+## Download Latest (No Version Number Required)
+
+```bash
+# Auto-download the current latest bundle for your platform
+curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/tools/download-latest.js
+node download-latest.js                  # detects linux/macos/windows automatically
+node download-latest.js --dry-run        # just print the download URL
+node download-latest.js --platform macos # force a specific platform
+```
+
+The tool reads `latest.json` to resolve the current version, then downloads the correct bundle.
+
+---
+
 ## Verify a Download
 
 ```bash

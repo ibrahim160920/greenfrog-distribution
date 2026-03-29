@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "releaseId": "54d7c651-81a2-432b-b494-b7f300808354",
+  "releaseId": "9134943a-e19b-4d47-85f1-07aa38857def",
   "version": "1.4.0",
-  "releasedAt": "2026-03-29T05:30:19.349Z",
+  "releasedAt": "2026-03-29T06:24:10.054Z",
   "compatibilityConstraint": ">=1.4.0",
   "bundleType": "mother_promoted",
-  "bundleHash": "28ccc35690537d14630cb6f5cb13b625751fed99ce871f3968028206a9e8797e",
-  "bundleSize": 87319395,
-  "downloadUrl": "https://github.com/ibrahim160920/greenfrog-distribution/raw/main/windows/greenfrog-v1.4.0-windows.zip",
+  "bundleHash": "acee217a6adbc76330e42a433927f2f3417d923f35890d2c3180f2106e9c8efb",
+  "bundleSize": 87320112,
+  "downloadUrl": "https://distribution.greenfrog.example.com/v1.4.0/greenfrog-v1.4.0-windows.zip",
   "keyId": "c4ba4d8eeeb0ec21",
-  "signature": "W6sJ9t1c6J747s9jG0BKw9456qPxXx3BKff2lF4BKuC-8VA56Dtjrhq58oV7Fn4R-8OBUb7maoLJBlo5jluLBw"
+  "signature": "dM-4_AH7c_NgKm3l5B7TiMA81FuAv6CRZD5KiNqYPvnybK3oLyjpAklewvDSzFLgW9lP-y-hfgvW2L08bNsgCg"
 }

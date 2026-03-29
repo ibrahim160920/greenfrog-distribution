@@ -66,7 +66,7 @@ if exist "%DATA_DIR%\runtime\index.js" (
     goto :maybe_set_url
 )
 
-rem Run installer 鈥?pass DataDir and EnrollmentUrl so they are honoured
+rem Run installer - pass DataDir and EnrollmentUrl so they are honoured
 echo   Installing GreenFrog...
 echo.
 "%POWERSHELL_EXE%" -ExecutionPolicy Bypass -File "%SCRIPT_DIR%\install.ps1" -DataDir "%DATA_DIR%" -EnrollmentUrl "%ENROLLMENT_URL%"

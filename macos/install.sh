@@ -28,6 +28,10 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 # GF_BASE_DIR env var or --data-dir flag override this default.
 DATA_DIR="${GF_BASE_DIR:-$PARENT_DIR/GreenFrog}"
 ENROLLMENT_URL=""
+REQUIRED_NODE_MAJOR="24"
+if [ -f "$SCRIPT_DIR/runtime-node-major.txt" ]; then
+  REQUIRED_NODE_MAJOR="$(tr -d '[:space:]' < "$SCRIPT_DIR/runtime-node-major.txt")"
+fi
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
@@ -57,31 +61,26 @@ echo "  GreenFrog — Child Runtime Installer (macOS)"
 echo "$SEP"
 echo
 
-# ── Step 1: Check Node.js >= 22 ───────────────────────────────────────────────
+# ── Step 1: Check required Node.js major ─────────────────────────────────────
 echo "  Checking Node.js..."
 if ! command -v node >/dev/null 2>&1; then
   echo
   echo "  ERROR: Node.js is not installed."
   echo
-  echo "  Install Node.js 22 or later — choose one:"
+  echo "  Install Node.js $REQUIRED_NODE_MAJOR.x from:"
   echo
-  echo "    Homebrew (recommended):"
-  echo "      brew install node"
-  echo
-  echo "    Official installer: https://nodejs.org/en/download/"
-  echo
-  echo "  If Homebrew is not installed:"
-  echo "    /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+  echo "    https://nodejs.org/en/download/releases/"
   echo
   exit 1
 fi
 
 NODE_VERSION=$(node --version | sed 's/v//')
 NODE_MAJOR=$(echo "$NODE_VERSION" | cut -d. -f1)
-if [ "$NODE_MAJOR" -lt 22 ]; then
+if [ "$NODE_MAJOR" -ne "$REQUIRED_NODE_MAJOR" ]; then
   echo
-  echo "  ERROR: Node.js $NODE_VERSION detected. Version 22 or later is required."
-  echo "  Upgrade: brew upgrade node  or  https://nodejs.org/en/download/"
+  echo "  ERROR: Node.js $NODE_VERSION detected. This distribution currently requires Node.js $REQUIRED_NODE_MAJOR.x."
+  echo "  Reason: bundled native modules are built for the Node $REQUIRED_NODE_MAJOR ABI."
+  echo "  Install Node.js $REQUIRED_NODE_MAJOR.x from: https://nodejs.org/en/download/releases/"
   echo
   exit 1
 fi
@@ -180,6 +179,19 @@ cat > "$LAUNCHER" <<LAUNCHER
 set -euo pipefail
 CONFIG_FILE="$CONFIG_FILE"
 RUNTIME_DIR="$RUNTIME_DIR"
+REQUIRED_NODE_MAJOR_FILE="\$RUNTIME_DIR/runtime-node-major.txt"
+REQUIRED_NODE_MAJOR="24"
+if [ -f "\$REQUIRED_NODE_MAJOR_FILE" ]; then
+  REQUIRED_NODE_MAJOR="\$(tr -d '[:space:]' < "\$REQUIRED_NODE_MAJOR_FILE")"
+fi
+NODE_VERSION="\$(node --version | sed 's/v//')"
+NODE_MAJOR="\$(echo "\$NODE_VERSION" | cut -d. -f1)"
+if [ "\$NODE_MAJOR" -ne "\$REQUIRED_NODE_MAJOR" ]; then
+  echo "ERROR: Node.js \$NODE_VERSION detected. This distribution currently requires Node.js \$REQUIRED_NODE_MAJOR.x."
+  echo "Reason: bundled native modules are built for the Node \$REQUIRED_NODE_MAJOR ABI."
+  echo "Install Node.js \$REQUIRED_NODE_MAJOR.x from: https://nodejs.org/en/download/releases/"
+  exit 1
+fi
 source "\$CONFIG_FILE" 2>/dev/null || true
 export GF_IS_CHILD_INSTANCE=true
 export GF_BASE_DIR="\${GF_BASE_DIR:-$DATA_DIR}"

@@ -116,7 +116,7 @@ Detailed trust model: [Trust Model](trust-model.md)
 | macOS    | 11 (Big Sur) or later |
 | Windows  | Windows 10 or later |
 
-Node.js 22 or later is required on all platforms.
+The current v1.4.0 child distribution bundles require Node.js 24.x on all platforms.
 
 ---
 

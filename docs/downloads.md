@@ -15,7 +15,7 @@ Released: 2026-03-28
 | **macOS** | [greenfrog-v1.4.0-macos.tar.gz](../macos/greenfrog-v1.4.0-macos.tar.gz) | [SHA256SUMS](../checksums/SHA256SUMS) | [macos.sig](../signatures/1.4.0/macos.sig) |
 | **Windows** | [greenfrog-v1.4.0-windows.zip](../windows/greenfrog-v1.4.0-windows.zip) | [SHA256SUMS](../checksums/SHA256SUMS) | [windows.sig](../signatures/1.4.0/windows.sig) |
 
-**Requires Node.js 22 or later.**
+**Current v1.4.0 bundles require Node.js 24.x.**
 
 ---
 
@@ -93,6 +93,6 @@ Full history: [release-notes/index.md](../release-notes/index.md)
 
 ## Requirements
 
-- Node.js 22 or later — [nodejs.org](https://nodejs.org/en/download/)
+- Node.js 24.x for the current v1.4.0 bundles — [nodejs.org](https://nodejs.org/en/download/releases/)
 - Linux (glibc 2.17+), macOS 11+, or Windows 10+
 - 512 MB RAM, 200 MB disk space

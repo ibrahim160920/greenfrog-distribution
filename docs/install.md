@@ -4,7 +4,7 @@
 
 | Requirement | Minimum |
 |-------------|---------|
-| Node.js | 22 or later |
+| Node.js | 24.x for current v1.4.0 bundles |
 | macOS | 11 (Big Sur) or later |
 | Linux | Any distribution with glibc 2.17+ |
 | Windows | Windows 10 or later |
@@ -13,14 +13,11 @@
 
 Check your Node.js version:
 ```sh
-node --version   # must print v22.x.x or higher
+node --version   # must print v24.x.x for the current v1.4.0 bundles
 ```
 
-If Node.js is missing or outdated:
-- **macOS**: `brew install node` or https://nodejs.org/en/download/
-- **Linux (Ubuntu/Debian)**: `sudo apt-get install nodejs npm`
-- **Linux (Fedora/RHEL)**: `sudo dnf install nodejs`
-- **Windows**: `winget install OpenJS.NodeJS` or https://nodejs.org/en/download/
+If Node.js is missing or outdated, install Node.js 24.x from:
+- https://nodejs.org/en/download/releases/
 
 ---
 
@@ -206,7 +203,7 @@ See [docs/signature-verification.md](signature-verification.md) for manual steps
 ## Troubleshooting
 
 ### "Node.js is not installed" or version too old
-Install or upgrade Node.js to version 22 or later. See System Requirements above.
+Install or upgrade to Node.js 24.x. The current v1.4.0 distribution bundles native modules built for the Node 24 ABI.
 
 ### "permission denied" on Linux/macOS
 ```sh

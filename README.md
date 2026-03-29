@@ -20,7 +20,7 @@ by your instance before being applied. Your sessions and data stay local.
 | **macOS** | [greenfrog-v1.4.0-macos.tar.gz](macos/greenfrog-v1.4.0-macos.tar.gz) | `bash install.sh` |
 | **Windows** | [greenfrog-v1.4.0-windows.zip](windows/greenfrog-v1.4.0-windows.zip) | `install.ps1` or `bootstrap.bat` |
 
-**Requires Node.js 22 or later.** Check: `node --version`
+**Current v1.4.0 bundles require Node.js 24.x.** Check: `node --version`
 
 [Release Notes v1.4.0](release-notes/v1.4.0.md) · [All Releases](release-notes/index.md) · [Checksums](checksums/SHA256SUMS) · [Public Key](public-key.md) · [Verify](docs/signature-verification.md)
 
@@ -45,7 +45,7 @@ curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribu
 curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/tools/verify-release.js
 curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/public-key.pem
 
-# Verify (requires Node.js 22+)
+# Verify (requires Node.js 24.x for the current v1.4.0 bundles)
 node verify-release.js --manifest linux.json --bundle greenfrog-v1.4.0-linux.tar.gz
 ```
 
@@ -223,7 +223,7 @@ we can confirm whether it is a signature or packaging issue.
 
 ## Requirements
 
-- Node.js 22 or later ([nodejs.org](https://nodejs.org/en/download/))
+- Node.js 24.x for the current v1.4.0 bundles ([nodejs.org](https://nodejs.org/en/download/releases/))
 - Linux (glibc 2.17+), macOS 11+, or Windows 10+
 - 512 MB RAM available
 - 200 MB disk space

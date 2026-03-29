@@ -20,7 +20,7 @@ by your instance before being applied. Your sessions and data stay local.
 | **macOS** | [greenfrog-v1.4.0-macos.tar.gz](macos/greenfrog-v1.4.0-macos.tar.gz) | `bash install.sh` |
 | **Windows** | [greenfrog-v1.4.0-windows.zip](windows/greenfrog-v1.4.0-windows.zip) | `install.ps1` or `bootstrap.bat` |
 
-**Current v1.4.0 bundles require Node.js 24.x.** Check: `node --version`
+**Linux/macOS bundles currently require Node.js 24.x. Windows installers automatically provision a local runtime and do not require system Node.js.**
 
 [Release Notes v1.4.0](release-notes/v1.4.0.md) · [All Releases](release-notes/index.md) · [Checksums](checksums/SHA256SUMS) · [Public Key](public-key.md) · [Verify](docs/signature-verification.md)
 
@@ -45,7 +45,7 @@ curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribu
 curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/tools/verify-release.js
 curl -fsSL -O https://raw.githubusercontent.com/ibrahim160920/greenfrog-distribution/main/public-key.pem
 
-# Verify (requires Node.js 24.x for the current v1.4.0 bundles)
+# Verify (requires Node.js on Linux/macOS, or any machine used to run the verifier)
 node verify-release.js --manifest linux.json --bundle greenfrog-v1.4.0-linux.tar.gz
 ```
 
@@ -59,7 +59,7 @@ cd greenfrog-v1.4.0-linux/
 bash install.sh
 ```
 
-For Windows: extract the `.zip` and run `bootstrap.bat` (guided) or `install.ps1`.
+For Windows: extract the `.zip` and run `bootstrap.bat` (guided) or `install.ps1`. The Windows installer provisions its own local runtime automatically.
 
 **Step 3 — Start**
 
@@ -223,7 +223,8 @@ we can confirm whether it is a signature or packaging issue.
 
 ## Requirements
 
-- Node.js 24.x for the current v1.4.0 bundles ([nodejs.org](https://nodejs.org/en/download/releases/))
+- Linux/macOS: Node.js 24.x for current v1.4.0 bundles ([nodejs.org](https://nodejs.org/en/download/releases/))
+- Windows: no separate Node.js install required; the installer provisions a local runtime automatically
 - Linux (glibc 2.17+), macOS 11+, or Windows 10+
 - 512 MB RAM available
 - 200 MB disk space

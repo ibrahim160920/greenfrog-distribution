@@ -4,19 +4,19 @@
 
 | Requirement | Minimum |
 |-------------|---------|
-| Node.js | 24.x for current v1.4.0 bundles |
+| Node.js | Linux/macOS: 24.x for current v1.4.0 bundles; Windows: installer provisions a local runtime |
 | macOS | 11 (Big Sur) or later |
 | Linux | Any distribution with glibc 2.17+ |
 | Windows | Windows 10 or later |
 | RAM | 512 MB available |
 | Disk | 200 MB free |
 
-Check your Node.js version:
+Check your Node.js version on Linux/macOS:
 ```sh
-node --version   # must print v24.x.x for the current v1.4.0 bundles
+node --version   # must print v24.x.x for the current v1.4.0 Linux/macOS bundles
 ```
 
-If Node.js is missing or outdated, install Node.js 24.x from:
+If Node.js is missing or outdated on Linux/macOS, install Node.js 24.x from:
 - https://nodejs.org/en/download/releases/
 
 ---
@@ -93,7 +93,8 @@ bash install.sh --data-dir ~/Applications/GreenFrog
 ### Windows
 
 Extract the `.zip` bundle, then **double-click `bootstrap.bat`** — it installs and launches
-in one step.
+in one step. The Windows installer provisions a local Node runtime into the install
+directory and does not depend on your system `node`.
 
 Or run the installer directly from PowerShell:
 ```powershell
@@ -203,7 +204,7 @@ See [docs/signature-verification.md](signature-verification.md) for manual steps
 ## Troubleshooting
 
 ### "Node.js is not installed" or version too old
-Install or upgrade to Node.js 24.x. The current v1.4.0 distribution bundles native modules built for the Node 24 ABI.
+On Linux/macOS, install or upgrade to Node.js 24.x. The current v1.4.0 distribution bundles native modules built for the Node 24 ABI. On Windows, the installer provisions a matching local runtime automatically.
 
 ### "permission denied" on Linux/macOS
 ```sh

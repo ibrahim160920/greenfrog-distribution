@@ -11,7 +11,7 @@
  *   node download-latest.js --dry-run     (print download URL without downloading)
  *   node download-latest.js --help
  *
- * Requires: Node.js 24.x for the current v1.4.0 runtime bundle (this script itself uses only built-in modules)
+ * Requires: Node.js to run this downloader. The current Linux/macOS v1.4.0 bundles use Node 24.x; Windows installers provision a local runtime automatically.
  *
  * Distribution base URL is read from the GREENFROG_DIST_BASE environment variable,
  * or defaults to the official GitHub raw content base.

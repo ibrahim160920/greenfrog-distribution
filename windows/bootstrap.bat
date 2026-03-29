@@ -20,8 +20,6 @@ set SCRIPT_DIR=%~dp0
 if "%SCRIPT_DIR:~-1%"=="\" set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%
 for %%I in ("%SCRIPT_DIR%\..") do set PARENT_DIR=%%~fI
 set DATA_DIR=%PARENT_DIR%\GreenFrog
-set REQUIRED_NODE_MAJOR=24
-if exist "%SCRIPT_DIR%\runtime-node-major.txt" set /p REQUIRED_NODE_MAJOR=<"%SCRIPT_DIR%\runtime-node-major.txt"
 
 rem Parse arguments
 :parse_args
@@ -46,31 +44,6 @@ echo ============================================================
 echo   GreenFrog
 echo ============================================================
 echo.
-
-rem Check Node.js
-where node >nul 2>&1
-if %errorlevel% neq 0 (
-    echo   ERROR: Node.js is not installed.
-    echo.
-    echo   Install Node.js %REQUIRED_NODE_MAJOR%.x from:
-    echo     https://nodejs.org/en/download/releases/
-    echo.
-    pause
-    exit /b 1
-)
-
-for /f "delims=" %%A in ('node --version 2^>nul') do set NODE_VERSION=%%A
-set NODE_VERSION=%NODE_VERSION:v=%
-for /f "tokens=1 delims=." %%A in ("%NODE_VERSION%") do set NODE_MAJOR=%%A
-if not "%NODE_MAJOR%"=="%REQUIRED_NODE_MAJOR%" (
-    echo   ERROR: Node.js %NODE_VERSION% detected. This distribution currently requires Node.js %REQUIRED_NODE_MAJOR%.x.
-    echo   Reason: bundled native modules are built for the Node %REQUIRED_NODE_MAJOR% ABI.
-    echo   Install Node.js %REQUIRED_NODE_MAJOR%.x from:
-    echo     https://nodejs.org/en/download/releases/
-    echo.
-    pause
-    exit /b 1
-)
 
 rem Check if already installed
 if exist "%DATA_DIR%\runtime\index.js" (

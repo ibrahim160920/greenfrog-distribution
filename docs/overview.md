@@ -116,7 +116,7 @@ Detailed trust model: [Trust Model](trust-model.md)
 | macOS    | 11 (Big Sur) or later |
 | Windows  | Windows 10 or later |
 
-The current v1.4.0 child distribution bundles require Node.js 24.x on all platforms.
+The current v1.4.0 Linux/macOS child bundles require Node.js 24.x. The Windows child installer provisions a matching local runtime automatically.
 
 ---
 

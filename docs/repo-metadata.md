@@ -21,7 +21,7 @@ Full name: `ibrahim160920/greenfrog-distribution`
 Recommended (160 characters max, no markdown):
 
 ```
-GreenFrog child runtime distribution — local AI agent, signed releases, Ed25519-verified updates. Linux, macOS, Windows. Current v1.4.0 bundles require Node.js 24.x.
+GreenFrog child runtime distribution — local AI agent, signed releases, Ed25519-verified updates. Linux/macOS use Node.js 24.x; Windows installer provisions its own runtime.
 ```
 
 Short alternative (≤ 100 chars):
@@ -98,7 +98,7 @@ Recommended image size: **1280 × 640 px** (GitHub renders at 1200 × 630).
 │   Verified · Updatable · Yours                           │
 │                                                          │
 │   ┌────────────────────────────────────────────────┐    │
-│   │  Linux · macOS · Windows · Node.js 24.x        │    │
+│   │  Linux · macOS · Windows · auto runtime        │    │
 │   │  Ed25519-signed · Governed updates             │    │
 │   └────────────────────────────────────────────────┘    │
 │                                                          │
@@ -114,7 +114,7 @@ Accent / badge row: muted teal or green
 Alt text for accessibility:
 ```
 GreenFrog v1.4.0 — Local-first AI agent runtime. Verified, updatable, yours.
-Linux, macOS, Windows. Current v1.4.0 bundles require Node.js 24.x. Ed25519-signed releases.
+Linux, macOS, Windows. Linux/macOS use Node.js 24.x; Windows installer provisions its own runtime. Ed25519-signed releases.
 ```
 
 ---

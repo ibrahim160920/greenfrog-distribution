@@ -24,12 +24,13 @@ $PowerShellExe = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powe
 if (-not (Test-Path $PowerShellExe)) {
     $PowerShellExe = "powershell.exe"
 }
-$RequiredNodeMajorFile = Join-Path $ScriptDir "runtime-node-major.txt"
-$RequiredNodeMajor = if (Test-Path $RequiredNodeMajorFile) {
-    [int](Get-Content $RequiredNodeMajorFile -Raw).Trim()
+$RequiredNodeVersionFile = Join-Path $ScriptDir "runtime-node-version.txt"
+$RequiredNodeVersion = if (Test-Path $RequiredNodeVersionFile) {
+    (Get-Content $RequiredNodeVersionFile -Raw).Trim().TrimStart('v')
 } else {
-    24
+    "24.14.0"
 }
+$NodeRuntimeZipOverride = $env:GF_NODE_RUNTIME_ZIP
 
 # ---- Default paths -----------------------------------------------------------
 # Install alongside the extraction directory -- visible, non-system, predictable.
@@ -42,6 +43,10 @@ $RuntimeDir  = Join-Path $DataDir "runtime"
 $BinDir      = Join-Path $DataDir "bin"
 $LogsDir     = Join-Path $DataDir "logs"
 $CacheDir    = Join-Path $DataDir "update-cache"
+$BundledNodeSource = Join-Path $ScriptDir "node-runtime\node.exe"
+$BundledNodeDir = Join-Path $RuntimeDir "node-runtime"
+$BundledNodeExe = Join-Path $BundledNodeDir "node.exe"
+$NodeRuntimeZipUrl = "https://nodejs.org/dist/v$RequiredNodeVersion/node-v$RequiredNodeVersion-win-x64.zip"
 
 $SEP = "=" * 60
 
@@ -50,31 +55,14 @@ Write-Host "  GreenFrog -- Child Runtime Installer (Windows)"
 Write-Host $SEP
 Write-Host
 
-# ---- Step 1: Check required Node.js major -----------------------------------
-Write-Host "  Checking Node.js..."
-$nodeCmd = Get-Command node -ErrorAction SilentlyContinue
-if (-not $nodeCmd) {
-    Write-Host
-    Write-Host "  ERROR: Node.js is not installed."
-    Write-Host
-    Write-Host "  Install Node.js $RequiredNodeMajor.x from:"
-    Write-Host
-    Write-Host "    https://nodejs.org/en/download/releases/"
-    Write-Host
-    exit 1
+# ---- Step 1: Resolve local runtime source -----------------------------------
+Write-Host "  Checking local runtime bootstrap..."
+if (Test-Path $BundledNodeSource) {
+    Write-Host "  Packaged node-runtime found in the extracted bundle."
+} else {
+    Write-Host "  Packaged node-runtime not embedded in this ZIP."
+    Write-Host "  GreenFrog will provision Node.js v$RequiredNodeVersion locally during install."
 }
-
-$nodeVersion = (node --version).TrimStart('v')
-$nodeMajor   = [int]($nodeVersion.Split('.')[0])
-if ($nodeMajor -ne $RequiredNodeMajor) {
-    Write-Host
-    Write-Host "  ERROR: Node.js $nodeVersion detected. This distribution currently requires Node.js $RequiredNodeMajor.x."
-    Write-Host "  Reason: bundled native modules are built for the Node $RequiredNodeMajor ABI."
-    Write-Host "  Install Node.js $RequiredNodeMajor.x from: https://nodejs.org/en/download/releases/"
-    Write-Host
-    exit 1
-}
-Write-Host "  Node.js v$nodeVersion -- OK"
 Write-Host
 
 # ---- Step 2: Create directory structure -------------------------------------
@@ -123,6 +111,71 @@ if (-not (Test-Path (Join-Path $RuntimeDir "index.js"))) {
     exit 1
 }
 Write-Host "  Runtime files installed."
+Write-Host
+
+# ---- Step 3.5: Provision local node runtime ---------------------------------
+function Install-NodeRuntimeFromZip([string]$zipPath, [string]$destinationExe) {
+    $extractRoot = Join-Path $env:TEMP ("gf-node-extract-" + [guid]::NewGuid().ToString('N'))
+    try {
+        Expand-Archive -LiteralPath $zipPath -DestinationPath $extractRoot -Force
+        $extractedNode = Get-ChildItem -Path $extractRoot -Recurse -Filter node.exe | Select-Object -First 1
+        if (-not $extractedNode) {
+            throw "node.exe not found inside runtime ZIP"
+        }
+        New-Item -ItemType Directory -Force -Path (Split-Path $destinationExe -Parent) | Out-Null
+        Copy-Item -Force $extractedNode.FullName $destinationExe
+    } finally {
+        Remove-Item -Recurse -Force $extractRoot -ErrorAction SilentlyContinue
+    }
+}
+
+function Ensure-NodeRuntime([string]$destinationExe) {
+    if (Test-Path $BundledNodeSource) {
+        New-Item -ItemType Directory -Force -Path $BundledNodeDir | Out-Null
+        Copy-Item -Force $BundledNodeSource $destinationExe
+        return "packaged"
+    }
+
+    if (Test-Path $destinationExe) {
+        $existingVersion = (& $destinationExe --version).Trim().TrimStart('v')
+        if ($existingVersion -eq $RequiredNodeVersion) {
+            return "existing"
+        }
+        Remove-Item -Force $destinationExe
+    }
+
+    $runtimeZip = Join-Path $env:TEMP ("gf-node-runtime-" + $RequiredNodeVersion + ".zip")
+    $sourceLabel = ""
+    if ($NodeRuntimeZipOverride -and (Test-Path $NodeRuntimeZipOverride)) {
+        Copy-Item -Force $NodeRuntimeZipOverride $runtimeZip
+        $sourceLabel = "override"
+    } else {
+        try {
+            Invoke-WebRequest -Uri $NodeRuntimeZipUrl -OutFile $runtimeZip
+        } catch {
+            throw "failed to download $NodeRuntimeZipUrl"
+        }
+        $sourceLabel = "downloaded"
+    }
+
+    try {
+        Install-NodeRuntimeFromZip $runtimeZip $destinationExe
+    } finally {
+        Remove-Item -Force $runtimeZip -ErrorAction SilentlyContinue
+    }
+
+    return $sourceLabel
+}
+
+$runtimeSource = Ensure-NodeRuntime $BundledNodeExe
+if (-not (Test-Path $BundledNodeExe)) {
+    Write-Host
+    Write-Host "  ERROR: local node runtime could not be provisioned."
+    Write-Host
+    exit 1
+}
+$bundledNodeVersion = (& $BundledNodeExe --version).Trim().TrimStart('v')
+Write-Host "  Local Node runtime ready ($runtimeSource): v$bundledNodeVersion"
 Write-Host
 
 # ---- Step 4: Copy public key ------------------------------------------------
@@ -191,29 +244,10 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dataDir = Split-Path -Parent $scriptDir
 $configPath = Join-Path $dataDir "config.ps1"
 $runtimeEntry = Join-Path $dataDir "runtime\index.js"
-$requiredNodeMajorFile = Join-Path $dataDir "runtime\runtime-node-major.txt"
-$requiredNodeMajor = if (Test-Path $requiredNodeMajorFile) {
-    [int](Get-Content $requiredNodeMajorFile -Raw).Trim()
-} else {
-    24
-}
-
-$nodeCmd = Get-Command node -ErrorAction SilentlyContinue
-if (-not $nodeCmd) {
+$bundledNode = Join-Path $dataDir "runtime\node-runtime\node.exe"
+if (-not (Test-Path $bundledNode)) {
     Write-Host
-    Write-Host "ERROR: Node.js $requiredNodeMajor.x is required but was not found."
-    Write-Host "Install from: https://nodejs.org/en/download/releases/"
-    Write-Host
-    exit 1
-}
-
-$nodeVersion = (& node --version).Trim().TrimStart('v')
-$nodeMajor = [int]($nodeVersion.Split('.')[0])
-if ($nodeMajor -ne $requiredNodeMajor) {
-    Write-Host
-    Write-Host "ERROR: Node.js $nodeVersion detected. This distribution currently requires Node.js $requiredNodeMajor.x."
-    Write-Host "Reason: bundled native modules are built for the Node $requiredNodeMajor ABI."
-    Write-Host "Install Node.js $requiredNodeMajor.x from: https://nodejs.org/en/download/releases/"
+    Write-Host "ERROR: local node-runtime\\node.exe is missing from the GreenFrog install."
     Write-Host
     exit 1
 }
@@ -227,7 +261,7 @@ if (-not $env:GF_BASE_DIR) {
     $env:GF_BASE_DIR = $dataDir
 }
 
-& node $runtimeEntry @ForwardArgs
+& $bundledNode $runtimeEntry @ForwardArgs
 exit $LASTEXITCODE
 '@ | Set-Content -Encoding UTF8 $launcherPs1Path
 Write-Host "  Launcher created: $launcherPs1Path"

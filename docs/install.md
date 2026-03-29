@@ -151,6 +151,80 @@ default — it initializes itself locally and starts immediately.
 
 ---
 
+## AI Provider Configuration
+
+Personal mode and AI model connectivity are separate concerns:
+
+- Personal mode means you do not need a GreenFrog distribution server.
+- To use cloud models, you still need to configure an AI provider.
+- If you want fully local inference instead, use a local provider such as Ollama.
+
+### Profile A: quan2go / capi relay
+
+Use this profile when your key is for `https://capi.quan2go.com/openai` and the
+relay expects `api-key` authentication plus the Responses API.
+
+Linux / macOS (`GreenFrog/config.sh`):
+
+```sh
+export OPENAI_API_KEY="your-relay-key"
+export OPENAI_BASE_URL="https://capi.quan2go.com/openai"
+export OPENAI_MODEL="gpt-5.4"
+export OPENAI_USE_RESPONSES_API="true"
+export OPENAI_AUTH_MODE="apikey"
+export OPENAI_REASONING_EFFORT="high"
+export OPENAI_DISABLE_RESPONSE_STORAGE="true"
+```
+
+Windows (`GreenFrog/config.ps1`):
+
+```powershell
+$env:OPENAI_API_KEY = "your-relay-key"
+$env:OPENAI_BASE_URL = "https://capi.quan2go.com/openai"
+$env:OPENAI_MODEL = "gpt-5.4"
+$env:OPENAI_USE_RESPONSES_API = "true"
+$env:OPENAI_AUTH_MODE = "apikey"
+$env:OPENAI_REASONING_EFFORT = "high"
+$env:OPENAI_DISABLE_RESPONSE_STORAGE = "true"
+```
+
+### Profile B: private / self-hosted OpenAI-compatible relay
+
+Use this profile when you have your own relay host, for example
+`http://your-relay-host:3000/openai`.
+
+Linux / macOS (`GreenFrog/config.sh`):
+
+```sh
+export OPENAI_API_KEY="your-relay-key"
+export OPENAI_BASE_URL="http://your-relay-host:3000/openai"
+export OPENAI_MODEL="your-relay-model"
+export OPENAI_USE_RESPONSES_API="true"
+export OPENAI_AUTH_MODE="bearer"
+```
+
+Windows (`GreenFrog/config.ps1`):
+
+```powershell
+$env:OPENAI_API_KEY = "your-relay-key"
+$env:OPENAI_BASE_URL = "http://your-relay-host:3000/openai"
+$env:OPENAI_MODEL = "your-relay-model"
+$env:OPENAI_USE_RESPONSES_API = "true"
+$env:OPENAI_AUTH_MODE = "bearer"
+```
+
+Compatibility notes:
+
+- `OPENAI_AUTH_MODE="bearer"` is the standard OpenAI-compatible default.
+- If your relay expects `api-key: <token>` instead, change `OPENAI_AUTH_MODE` to `apikey`.
+- If your relay expects a custom auth header, set `OPENAI_AUTH_MODE="raw"`, `OPENAI_AUTH_HEADER="x-auth-token"`, and `OPENAI_AUTH_SCHEME="Token"`.
+- If your relay only supports `chat/completions`, leave `OPENAI_USE_RESPONSES_API` unset.
+- `OPENAI_EXTRA_HEADERS` accepts a JSON object string for relay-specific headers.
+
+After editing the config file, restart GreenFrog.
+
+---
+
 ## Verifying Installation
 
 After the first successful launch, you can check the runtime status:

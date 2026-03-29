@@ -266,6 +266,9 @@ $env:GF_IS_CHILD_INSTANCE = "true"
 if (-not $env:GF_BASE_DIR) {
     $env:GF_BASE_DIR = $dataDir
 }
+if (-not $env:DATA_DIR) {
+    $env:DATA_DIR = $dataDir
+}
 
 $resolvedArgs = @()
 if ($ForwardArgs.Count -eq 0 -or $ForwardArgs[0].StartsWith('-')) {

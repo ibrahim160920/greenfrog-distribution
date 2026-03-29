@@ -190,7 +190,11 @@ GitHub's integrity.
 **Do I need a server to use GreenFrog?**
 No. GreenFrog runs in personal mode by default — it initializes its own local identity
 on first launch and starts immediately without any server. No enrollment URL, no
-account, no external service required.
+account, no GreenFrog distribution server required.
+
+If you want to use cloud models, configure an AI provider in `config.sh` or
+`config.ps1`. Two relay examples (quan2go / capi and private OpenAI-compatible
+relay) are documented in [docs/install.md](docs/install.md).
 
 If you connect to a managed distribution server (optional, for organizations), you gain
 signed capability updates and governed experience sharing. That connection is established

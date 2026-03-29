@@ -1,25 +1,32 @@
 #!/usr/bin/env bash
 # GreenFrog Linux Installer
 # ============================================================
-# Installs the GreenFrog child runtime to ~/.greenfrog/runtime
-# and creates a launch wrapper at ~/.greenfrog/bin/greenfrog.
+# Installs the GreenFrog child runtime to <extract-parent>/GreenFrog/runtime
+# and creates a launch wrapper at <extract-parent>/GreenFrog/bin/greenfrog.
 #
 # Usage:
 #   bash install.sh [--enrollment-url <url>] [--data-dir <dir>]
 #
 # Options:
-#   --enrollment-url <url>   Mother-body enrollment endpoint.
+#   --enrollment-url <url>   Enrollment server URL (optional).
+#                            For managed/organization deployments only.
 #                            Writes to config.sh automatically.
-#                            If omitted, you will be prompted on first launch.
+#                            Omit for personal use — GreenFrog starts locally
+#                            without any server configuration.
 #   --data-dir <dir>         Override installation directory
-#                            (default: ~/.greenfrog)
+#                            (default: <parent of extraction dir>/GreenFrog)
 # ============================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
-DATA_DIR="${GF_BASE_DIR:-$HOME/.greenfrog}"
+# Default: install to a visible GreenFrog directory next to the extraction dir.
+#   e.g. extracted to /home/user/Downloads/greenfrog-v1.4.0-linux/
+#        installs to  /home/user/Downloads/GreenFrog
+# GF_BASE_DIR env var or --data-dir flag override this default.
+DATA_DIR="${GF_BASE_DIR:-$PARENT_DIR/GreenFrog}"
 ENROLLMENT_URL=""
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
@@ -31,7 +38,8 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: bash install.sh [--enrollment-url <url>] [--data-dir <dir>]"
       echo ""
       echo "  --enrollment-url <url>   Set enrollment server URL in config (optional)"
-      echo "  --data-dir <dir>         Override install directory (default: ~/.greenfrog)"
+      echo "  --data-dir <dir>         Override install directory"
+      echo "                           Default: <parent of extraction dir>/GreenFrog"
       exit 0 ;;
     *) echo "Unknown option: $1"; exit 1 ;;
   esac
@@ -90,9 +98,17 @@ echo "  Logs     : $LOGS_DIR"
 echo
 
 # ── Step 3: Copy runtime files ────────────────────────────────────────────────
+# Source is always the extraction directory (where install.sh lives).
+# NEVER use ./* -- that copies from the current working directory, not the bundle.
 echo "  Copying runtime files..."
-cp -r "$SCRIPT_DIR"/../runtime/. "$RUNTIME_DIR/" 2>/dev/null || \
-  cp -r ./* "$RUNTIME_DIR/" 2>/dev/null || true
+if [ -d "$SCRIPT_DIR/runtime" ]; then
+  # Bundle has explicit runtime/ subdirectory
+  cp -r "$SCRIPT_DIR/runtime/." "$RUNTIME_DIR/"
+else
+  # Standard bundle layout: runtime files live alongside install.sh
+  cp -r "$SCRIPT_DIR/." "$RUNTIME_DIR/"
+  rm -f "$RUNTIME_DIR/install.sh" "$RUNTIME_DIR/public-key.pem" "$RUNTIME_DIR/bootstrap.bat"
+fi
 
 if [ ! -f "$RUNTIME_DIR/index.js" ]; then
   echo
@@ -105,11 +121,12 @@ echo "  Runtime files installed."
 echo
 
 # ── Step 4: Copy public key ───────────────────────────────────────────────────
-if [ -f "$SCRIPT_DIR/../public-key.pem" ]; then
-  cp "$SCRIPT_DIR/../public-key.pem" "$DATA_DIR/public-key.pem"
+# Key is in the extraction directory alongside install.sh
+if [ -f "$SCRIPT_DIR/public-key.pem" ]; then
+  cp "$SCRIPT_DIR/public-key.pem" "$DATA_DIR/public-key.pem"
   echo "  Public key installed."
-elif [ -f "./public-key.pem" ]; then
-  cp "./public-key.pem" "$DATA_DIR/public-key.pem"
+elif [ -f "$SCRIPT_DIR/../public-key.pem" ]; then
+  cp "$SCRIPT_DIR/../public-key.pem" "$DATA_DIR/public-key.pem"
   echo "  Public key installed."
 else
   echo "  WARNING: public-key.pem not found — manifest signature verification will be unavailable."
@@ -120,7 +137,7 @@ echo
 CONFIG_FILE="$DATA_DIR/config.sh"
 if [ ! -f "$CONFIG_FILE" ]; then
   TEMPLATE=""
-  for loc in "$SCRIPT_DIR/../runtime/config.sh.template" "./config.sh.template"; do
+  for loc in "$SCRIPT_DIR/config.sh.template" "$SCRIPT_DIR/../runtime/config.sh.template"; do
     [ -f "$loc" ] && TEMPLATE="$loc" && break
   done
 

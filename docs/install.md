@@ -36,27 +36,37 @@ cd greenfrog-vX.Y.Z-linux/
 # 2. Run the installer
 bash install.sh
 
-# 3. Add to PATH (one-time)
-echo 'export PATH="$HOME/.greenfrog/bin:$PATH"' >> ~/.bashrc
+# 3. Add to PATH (one-time — the installer prints the exact command)
+echo 'export PATH="/path/to/GreenFrog/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 
 # 4. Start GreenFrog
 greenfrog
 ```
 
-The installer creates `~/.greenfrog/` with the following layout:
+By default the installer creates a `GreenFrog/` folder **next to** the extracted bundle:
 
 ```
-~/.greenfrog/
-├── runtime/        ← Node.js application files
-├── bin/
-│   └── greenfrog   ← Launch wrapper
-├── logs/
-├── identity/       ← Created on first launch
-├── backflow/       ← Created on first launch
-├── inheritance/    ← Created on first launch
-├── config.sh       ← Optional: advanced configuration
-└── public-key.pem  ← Manifest signature verification key
+/home/user/Downloads/
+├── greenfrog-vX.Y.Z-linux/   ← extracted bundle (can delete after install)
+│   ├── install.sh
+│   ├── index.js
+│   └── ...
+└── GreenFrog/                 ← install destination
+    ├── runtime/               ← Node.js application files
+    ├── bin/
+    │   └── greenfrog          ← launch wrapper
+    ├── logs/
+    ├── identity/              ← created on first launch
+    ├── backflow/              ← created on first launch
+    ├── inheritance/           ← created on first launch
+    ├── config.sh              ← optional: advanced configuration
+    └── public-key.pem         ← manifest signature verification key
+```
+
+Override the default with `--data-dir`:
+```sh
+bash install.sh --data-dir /opt/greenfrog
 ```
 
 ### macOS
@@ -70,30 +80,61 @@ cd greenfrog-vX.Y.Z-macos/
 bash install.sh
 
 # 3. Add to PATH (one-time — the installer prints the exact command)
-echo 'export PATH="$HOME/.greenfrog/bin:$PATH"' >> ~/.zshrc
+echo 'export PATH="/path/to/GreenFrog/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # 4. Start GreenFrog
 greenfrog
 ```
 
+Same layout as Linux — installs to a `GreenFrog/` folder next to the extracted bundle.
+Override with `--data-dir`:
+```sh
+bash install.sh --data-dir ~/Applications/GreenFrog
+```
+
 ### Windows
 
+Extract the `.zip` bundle, then **double-click `bootstrap.bat`** — it installs and launches
+in one step.
+
+Or run the installer directly from PowerShell:
 ```powershell
-# Extract the .zip bundle, then double-click bootstrap.bat
-# Or from PowerShell:
 powershell -File install.ps1
 ```
 
-The installer creates `%APPDATA%\GreenFrog\` and adds
-`%APPDATA%\GreenFrog\bin` to your user PATH automatically.
+By default the installer creates a `GreenFrog\` folder **next to** the extracted bundle:
+
+```
+D:\
+├── greenfrog-vX.Y.Z-windows\   ← extracted bundle (can delete after install)
+│   ├── bootstrap.bat
+│   ├── install.ps1
+│   ├── index.js
+│   └── ...
+└── GreenFrog\                   ← install destination
+    ├── runtime\
+    ├── bin\
+    │   └── greenfrog.bat        ← launch wrapper
+    ├── logs\
+    ├── identity\
+    ├── config.ps1
+    └── public-key.pem
+```
+
+The installer adds `GreenFrog\bin` to your user PATH automatically.
 Open a new terminal after installation for the PATH change to take effect.
+
+Override the default with `--data-dir`:
+```powershell
+powershell -File install.ps1 -DataDir C:\Tools\GreenFrog
+```
 
 Then run:
 ```
 greenfrog
 ```
-(or double-click `bootstrap.bat`)
+(or double-click `GreenFrog\bin\bootstrap.bat`)
 
 ---
 
@@ -101,7 +142,7 @@ greenfrog
 
 On first launch, GreenFrog:
 
-1. Generates a unique local identity (stored in `~/.greenfrog/identity/`)
+1. Generates a unique local identity (stored in `GreenFrog/identity/`)
 2. Creates a locally-signed credential
 3. Starts the agent runtime at `http://localhost:18889`
 4. Opens the web interface in your browser
@@ -169,15 +210,13 @@ Install or upgrade Node.js to version 22 or later. See System Requirements above
 
 ### "permission denied" on Linux/macOS
 ```sh
-chmod +x ~/.greenfrog/bin/greenfrog
+chmod +x /path/to/GreenFrog/bin/greenfrog
 ```
 
 ### "greenfrog: command not found"
-The `bin/` directory is not on your PATH. Add it:
-```sh
-export PATH="$HOME/.greenfrog/bin:$PATH"
-```
-Add this line permanently to your shell profile (`~/.bashrc` or `~/.zshrc`).
+The `bin/` directory is not on your PATH. The installer prints the exact
+`echo 'export PATH=...'` command to run — copy and run it. Then `source` your
+shell profile or open a new terminal.
 
 ### SQLite lock error on startup
 Another GreenFrog process is already running. Stop all running instances:
@@ -200,13 +239,13 @@ provides signed capability updates and governed data sharing:
 # Linux / macOS: pass the URL at launch (one-time)
 greenfrog --enrollment-url https://your-server.example.com/api/distribution/enroll
 
-# Or set permanently in ~/.greenfrog/config.sh:
+# Or set permanently in GreenFrog/config.sh:
 export GF_ENROLLMENT_URL="https://your-server.example.com/api/distribution/enroll"
 export GF_DISTRIBUTION_URL="https://your-server.example.com"
 ```
 
 ```powershell
-# Windows: in %APPDATA%\GreenFrog\config.ps1:
+# Windows: in GreenFrog\config.ps1:
 $env:GF_ENROLLMENT_URL = "https://your-server.example.com/api/distribution/enroll"
 $env:GF_DISTRIBUTION_URL = "https://your-server.example.com"
 ```
@@ -222,16 +261,16 @@ Your organization's administrator will provide the enrollment URL.
 
 ### Linux / macOS
 ```sh
-# Remove the runtime and data directory
-rm -rf ~/.greenfrog
+# Remove the install directory (wherever GreenFrog was installed)
+rm -rf /path/to/GreenFrog
 
-# Remove from PATH (edit ~/.bashrc or ~/.zshrc and remove the export line)
+# Remove from PATH (edit ~/.bashrc or ~/.zshrc and delete the GreenFrog export line)
 ```
 
 ### Windows
 ```powershell
-# Remove the data directory
-Remove-Item -Recurse -Force "$env:APPDATA\GreenFrog"
+# Remove the install directory
+Remove-Item -Recurse -Force "C:\path\to\GreenFrog"
 
 # Remove from user PATH (System Properties → Environment Variables)
 # Or via PowerShell:

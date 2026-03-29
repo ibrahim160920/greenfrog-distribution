@@ -12,7 +12,14 @@ title GreenFrog
 setlocal enabledelayedexpansion
 
 set ENROLLMENT_URL=
-set DATA_DIR=%APPDATA%\GreenFrog
+set "POWERSHELL_EXE=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
+if not exist "%POWERSHELL_EXE%" set "POWERSHELL_EXE=powershell.exe"
+rem Default install location: sibling of the extraction directory named GreenFrog
+rem e.g. bootstrap.bat is in D:\greenfrog-v1.4.0-windows\  ->  DATA_DIR = D:\GreenFrog
+set SCRIPT_DIR=%~dp0
+if "%SCRIPT_DIR:~-1%"=="\" set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%
+for %%I in ("%SCRIPT_DIR%\..") do set PARENT_DIR=%%~fI
+set DATA_DIR=%PARENT_DIR%\GreenFrog
 
 rem Parse arguments
 :parse_args
@@ -59,11 +66,10 @@ if exist "%DATA_DIR%\runtime\index.js" (
     goto :maybe_set_url
 )
 
-rem Run installer — pass DataDir and EnrollmentUrl so they are honoured
+rem Run installer 鈥?pass DataDir and EnrollmentUrl so they are honoured
 echo   Installing GreenFrog...
 echo.
-set SCRIPT_DIR=%~dp0
-powershell -ExecutionPolicy Bypass -File "%SCRIPT_DIR%install.ps1" -DataDir "%DATA_DIR%" -EnrollmentUrl "%ENROLLMENT_URL%"
+"%POWERSHELL_EXE%" -ExecutionPolicy Bypass -File "%SCRIPT_DIR%\install.ps1" -DataDir "%DATA_DIR%" -EnrollmentUrl "%ENROLLMENT_URL%"
 if %errorlevel% neq 0 (
     echo.
     echo   Installation failed. See errors above.
@@ -76,7 +82,7 @@ goto :launch
 :maybe_set_url
 rem Write enrollment URL to config only if explicitly provided (already-installed path only)
 if not "%ENROLLMENT_URL%"=="" (
-    powershell -NonInteractive -ExecutionPolicy Bypass -Command "Add-Content -Encoding UTF8 '%DATA_DIR%\config.ps1' \"`n`$env:GF_ENROLLMENT_URL = '%ENROLLMENT_URL%'\""
+    "%POWERSHELL_EXE%" -NonInteractive -ExecutionPolicy Bypass -Command "Add-Content -Encoding UTF8 '%DATA_DIR%\config.ps1' \"`n`$env:GF_ENROLLMENT_URL = '%ENROLLMENT_URL%'\""
     echo   Enrollment URL configured: %ENROLLMENT_URL%
     echo.
 )

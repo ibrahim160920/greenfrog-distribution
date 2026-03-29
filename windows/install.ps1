@@ -1,16 +1,17 @@
 # GreenFrog Windows Installer
 # ============================================================
-# Installs the GreenFrog child runtime to %APPDATA%\GreenFrog\runtime
-# and creates a launch wrapper at %APPDATA%\GreenFrog\bin\greenfrog.bat
+# Installs the GreenFrog child runtime from the extraction directory.
+# Default install location: sibling of the extraction directory named GreenFrog.
+#   e.g. extracted to D:\greenfrog-v1.4.0-windows\  ->  installs to D:\GreenFrog
 #
 # Usage:
 #   powershell -File install.ps1 [-EnrollmentUrl <url>] [-DataDir <path>]
 #
 # Parameters:
-#   -EnrollmentUrl <url>   Mother-body enrollment endpoint.
+#   -EnrollmentUrl <url>   Mother-body enrollment endpoint (optional).
 #                          Writes to config.ps1 automatically.
-#                          If omitted, you can use bootstrap.bat for guided setup.
-#   -DataDir <path>        Override install directory (default: %APPDATA%\GreenFrog)
+#   -DataDir <path>        Override install directory.
+#                          Default: <parent of extraction dir>\GreenFrog
 # ============================================================
 param(
     [string]$EnrollmentUrl = "",
@@ -19,10 +20,17 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$PowerShellExe = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+if (-not (Test-Path $PowerShellExe)) {
+    $PowerShellExe = "powershell.exe"
+}
 
-# ── Default paths ─────────────────────────────────────────────────────────────
+# ---- Default paths -----------------------------------------------------------
+# Install alongside the extraction directory -- visible, non-system, predictable.
+# Explicit -DataDir or GF_BASE_DIR environment variable takes priority.
 if (-not $DataDir) {
-    $DataDir = if ($env:GF_BASE_DIR) { $env:GF_BASE_DIR } else { Join-Path $env:APPDATA "GreenFrog" }
+    $ParentDir = Split-Path -Parent $ScriptDir
+    $DataDir = if ($env:GF_BASE_DIR) { $env:GF_BASE_DIR } else { Join-Path $ParentDir "GreenFrog" }
 }
 $RuntimeDir  = Join-Path $DataDir "runtime"
 $BinDir      = Join-Path $DataDir "bin"
@@ -36,14 +44,14 @@ Write-Host "  GreenFrog -- Child Runtime Installer (Windows)"
 Write-Host $SEP
 Write-Host
 
-# ── Step 1: Check Node.js >= 22 ───────────────────────────────────────────────
+# ---- Step 1: Check Node.js >= 22 --------------------------------------------
 Write-Host "  Checking Node.js..."
 $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
 if (-not $nodeCmd) {
     Write-Host
     Write-Host "  ERROR: Node.js is not installed."
     Write-Host
-    Write-Host "  Install Node.js 22 or later — choose one:"
+    Write-Host "  Install Node.js 22 or later -- choose one:"
     Write-Host
     Write-Host "    winget (recommended, open a terminal and run):"
     Write-Host "      winget install OpenJS.NodeJS.LTS"
@@ -65,7 +73,7 @@ if ($nodeMajor -lt 22) {
 Write-Host "  Node.js v$nodeVersion -- OK"
 Write-Host
 
-# ── Step 2: Create directory structure ───────────────────────────────────────
+# ---- Step 2: Create directory structure -------------------------------------
 Write-Host "  Creating directories..."
 foreach ($d in @($RuntimeDir, $BinDir, $LogsDir, $CacheDir,
     (Join-Path $DataDir "identity"), (Join-Path $DataDir "backflow"),
@@ -77,13 +85,30 @@ Write-Host "  Data     : $DataDir"
 Write-Host "  Logs     : $LogsDir"
 Write-Host
 
-# ── Step 3: Copy runtime files ────────────────────────────────────────────────
+# ---- Step 3: Copy runtime files ---------------------------------------------
+# Source is always the extraction directory (where install.ps1 lives).
+# NEVER use ".\*" -- that depends on the current working directory and copies
+# system files when launched from System32 or any non-extraction directory.
 Write-Host "  Copying runtime files..."
-$runtimeSource = Join-Path (Split-Path $ScriptDir -Parent) "runtime"
-if (Test-Path $runtimeSource) {
-    Copy-Item -Recurse -Force (Join-Path $runtimeSource "*") $RuntimeDir
+$runtimeSubdir = Join-Path $ScriptDir "runtime"
+if (Test-Path (Join-Path $ScriptDir "index.js")) {
+    # Standard bundle layout: runtime files live alongside install.ps1.
+    # Do not treat a module directory named "runtime/" as the package root.
+    $excludeNames = [System.Collections.Generic.HashSet[string]]@(
+        "install.ps1", "bootstrap.bat", "public-key.pem"
+    )
+    Get-ChildItem -Path $ScriptDir |
+        Where-Object { -not $excludeNames.Contains($_.Name) } |
+        ForEach-Object { Copy-Item -Recurse -Force $_.FullName $RuntimeDir }
+} elseif (Test-Path (Join-Path $runtimeSubdir "index.js")) {
+    # Explicit runtime/ subdirectory bundle layout
+    Copy-Item -Recurse -Force (Join-Path $runtimeSubdir "*") $RuntimeDir
 } else {
-    Copy-Item -Recurse -Force ".\*" $RuntimeDir -Exclude "install.ps1","bootstrap.bat"
+    Write-Host
+    Write-Host "  ERROR: index.js not found in the extracted package."
+    Write-Host "  The Windows ZIP may be incomplete or corrupted."
+    Write-Host
+    exit 1
 }
 
 if (-not (Test-Path (Join-Path $RuntimeDir "index.js"))) {
@@ -96,24 +121,28 @@ if (-not (Test-Path (Join-Path $RuntimeDir "index.js"))) {
 Write-Host "  Runtime files installed."
 Write-Host
 
-# ── Step 4: Copy public key ───────────────────────────────────────────────────
-$keySource = Join-Path (Split-Path $ScriptDir -Parent) "public-key.pem"
+# ---- Step 4: Copy public key ------------------------------------------------
+# Key lives in the extraction directory alongside install.ps1
+$keySource = Join-Path $ScriptDir "public-key.pem"
+if (-not (Test-Path $keySource)) {
+    $keySource = Join-Path (Split-Path $ScriptDir -Parent) "public-key.pem"
+}
 $keyDest   = Join-Path $DataDir "public-key.pem"
 if (Test-Path $keySource) {
     Copy-Item -Force $keySource $keyDest
-    Write-Host "  Public key installed."
-} elseif (Test-Path ".\public-key.pem") {
-    Copy-Item -Force ".\public-key.pem" $keyDest
     Write-Host "  Public key installed."
 } else {
     Write-Warning "  public-key.pem not found -- manifest signature verification will be unavailable."
 }
 Write-Host
 
-# ── Step 5: Write config (preserving existing) ────────────────────────────────
+# ---- Step 5: Write config (preserving existing) -----------------------------
 $configFile = Join-Path $DataDir "config.ps1"
 if (-not (Test-Path $configFile)) {
-    $templatePath = Join-Path $RuntimeDir "config.ps1.template"
+    $templatePath = Join-Path $ScriptDir "config.ps1.template"
+    if (-not (Test-Path $templatePath)) {
+        $templatePath = Join-Path $RuntimeDir "config.ps1.template"
+    }
     if (Test-Path $templatePath) {
         Copy-Item -Force $templatePath $configFile
     } else {
@@ -136,7 +165,6 @@ if (-not (Test-Path $configFile)) {
 if ($EnrollmentUrl) {
     $lines = Get-Content $configFile -Raw
     if ($lines -match 'GF_ENROLLMENT_URL') {
-        # Replace existing line (commented or not)
         $lines = $lines -replace '(?m).*GF_ENROLLMENT_URL.*', "`$env:GF_ENROLLMENT_URL = `"$EnrollmentUrl`""
         Set-Content -Encoding UTF8 $configFile $lines
     } else {
@@ -146,23 +174,26 @@ if ($EnrollmentUrl) {
 }
 Write-Host
 
-# ── Step 6: Create launch wrapper (greenfrog.bat) ────────────────────────────
+# ---- Step 6: Create launch wrapper (greenfrog.bat) --------------------------
 $launcherPath = Join-Path $BinDir "greenfrog.bat"
-@"
+($(
+@'
 @echo off
 rem GreenFrog Child Runtime Launcher
 rem Auto-generated by installer -- do not edit manually
 set SCRIPT_DIR=%~dp0
 for %%I in ("%SCRIPT_DIR%..") do set DATA_DIR=%%~fI
-for /f "usebackq delims=" %%A in (`powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$cfg = Join-Path '$DataDir' 'config.ps1'; if (Test-Path \$cfg) { . \$cfg }; Get-ChildItem Env: | Where-Object { \$_.Name -like 'GF_*' } | ForEach-Object { Write-Output (\$_.Name + '=' + \$_.Value) }"`) do set "%%A"
+set "POWERSHELL_EXE=__POWERSHELL_EXE__"
+for /f "usebackq delims=" %%A in (`"%POWERSHELL_EXE%" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$cfg = Join-Path '%DATA_DIR%' 'config.ps1'; if (Test-Path $cfg) { . $cfg }; Get-ChildItem Env: | Where-Object { $_.Name -like 'GF_*' } | ForEach-Object { Write-Output ($_.Name + '=' + $_.Value) }"`) do set "%%A"
 set GF_IS_CHILD_INSTANCE=true
 if not defined GF_BASE_DIR set GF_BASE_DIR=%DATA_DIR%
 node "%DATA_DIR%\runtime\index.js" %*
-"@ | Set-Content -Encoding ASCII $launcherPath
+'@
+).Replace('__POWERSHELL_EXE__', $PowerShellExe)) | Set-Content -Encoding ASCII $launcherPath
 Write-Host "  Launcher created: $launcherPath"
 Write-Host
 
-# ── Step 7: Create bootstrap.bat (guided first-run entry) ────────────────────
+# ---- Step 7: Create bootstrap.bat (guided first-run entry) ------------------
 $bootstrapPath = Join-Path $BinDir "bootstrap.bat"
 @"
 @echo off
@@ -196,7 +227,7 @@ call "%DATA_DIR%\bin\greenfrog.bat"
 Write-Host "  Bootstrap created: $bootstrapPath"
 Write-Host
 
-# ── Step 8: Add to PATH ───────────────────────────────────────────────────────
+# ---- Step 8: Add to PATH ----------------------------------------------------
 $userPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -notlike "*$BinDir*") {
     try {
@@ -215,10 +246,12 @@ if ($userPath -notlike "*$BinDir*") {
 }
 Write-Host
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+# ---- Summary ----------------------------------------------------------------
 Write-Host $SEP
 Write-Host "  Installation complete!"
 Write-Host $SEP
+Write-Host
+Write-Host "  Install location : $DataDir"
 Write-Host
 Write-Host "  Next steps:"
 

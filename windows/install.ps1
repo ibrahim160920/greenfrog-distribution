@@ -310,6 +310,7 @@ echo.
 set SCRIPT_DIR=%~dp0
 for %%I in ("%SCRIPT_DIR%..") do set DATA_DIR=%%~fI
 set CONFIG_FILE=%DATA_DIR%\config.ps1
+set LOG_FILE=%DATA_DIR%\logs\startup.log
 set "POWERSHELL_EXE=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
 if not exist "%POWERSHELL_EXE%" set "POWERSHELL_EXE=powershell.exe"
 set "APP_URL=http://127.0.0.1:18889/"
@@ -333,7 +334,9 @@ echo   Starting GreenFrog...
 echo   On first launch, local identity is initialized automatically.
 echo   No server configuration required for personal use.
 echo.
-start "GreenFrog" "%DATA_DIR%\bin\greenfrog.bat"
+break > "%LOG_FILE%"
+echo [bootstrap] Starting GreenFrog at %DATE% %TIME%>> "%LOG_FILE%"
+start "GreenFrog" /min cmd /c ""%DATA_DIR%\bin\greenfrog.bat" >> "%LOG_FILE%" 2>&1"
 
 echo   Waiting for http://127.0.0.1:18889/ ...
 for /l %%I in (1,1,30) do (
@@ -344,8 +347,14 @@ for /l %%I in (1,1,30) do (
 
 echo.
 echo   ERROR: GreenFrog did not become reachable within 30 seconds.
-echo   Try running this manually to inspect logs:
-echo     %DATA_DIR%\bin\greenfrog.bat
+echo   Startup log:
+echo     %LOG_FILE%
+if exist "%LOG_FILE%" (
+    echo.
+    echo   ----- startup.log (tail) -----
+    "%POWERSHELL_EXE%" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Get-Content -Path '%LOG_FILE%' -Tail 60" 2>nul
+    echo   ----- end startup.log -----
+)
 echo.
 pause
 exit /b 1

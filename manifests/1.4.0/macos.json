@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "releaseId": "c2cccd34-2217-4429-8e52-3c96c2414b4d",
+  "releaseId": "c4c9d31a-f0e5-419c-9385-9c75de8fba59",
   "version": "1.4.0",
-  "releasedAt": "2026-03-29T10:04:11.546Z",
+  "releasedAt": "2026-03-29T12:09:28.412Z",
   "compatibilityConstraint": ">=1.4.0",
   "bundleType": "mother_promoted",
-  "bundleHash": "29ee6ad789e52840c05c72032a6843fd461d42086b7d47c29815de3bf6206c96",
-  "bundleSize": 76526369,
+  "bundleHash": "106306ad3f390f489dd271b90a3026fda13491785045780ed4f19b33fc0916a1",
+  "bundleSize": 76711278,
   "downloadUrl": "https://distribution.greenfrog.example.com/v1.4.0/greenfrog-v1.4.0-macos.tar.gz",
   "keyId": "c4ba4d8eeeb0ec21",
-  "signature": "uE7qbRe8oFVWi2bdaPkqmpU3zD-_EkosV4l7LEYiaLawhJ_BCB4rHTUp7CM8zT9euxj0UZgTHmS4-MRA1ob9AA"
+  "signature": "vc4Dycz-cDGvg7eeVT3RbJDC4IqeSuTs3azuEUUKepIla4V13TFC50dAkU33v20cwoNrA805VLh91ewphIiTBg"
 }

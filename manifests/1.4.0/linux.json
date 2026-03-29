@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "releaseId": "15b3bd38-5fa4-4439-99f5-eec1e17e0712",
+  "releaseId": "91e3b966-9351-436b-82df-43c3442f2d84",
   "version": "1.4.0",
-  "releasedAt": "2026-03-29T10:04:11.396Z",
+  "releasedAt": "2026-03-29T12:09:28.264Z",
   "compatibilityConstraint": ">=1.4.0",
   "bundleType": "mother_promoted",
-  "bundleHash": "d7e14a2dc710173a4e78e6667a7309b35ddc4a1eb9fa9ddac101974e534a9dfb",
-  "bundleSize": 76526865,
+  "bundleHash": "fb4146f8b48d9fd973eaef0977ee357a0b6c879712c1b3580aa9af0af5bd068c",
+  "bundleSize": 76709639,
   "downloadUrl": "https://distribution.greenfrog.example.com/v1.4.0/greenfrog-v1.4.0-linux.tar.gz",
   "keyId": "c4ba4d8eeeb0ec21",
-  "signature": "yXdIoEh4YzKOyPLYlfvVw3ttmNHIrmlBjapcGFhvCQJiNf0PQbGMggAH_2ICM42YYfB5_OYS-afHu6oB0rUtBw"
+  "signature": "HENEfLWnKJxa2IBtM4RrcGqh4Zj2p7xdwDf4scjJuZrjd9D0ZOkP04SdCSN0c6TayN02QxYLAHLLJcUfXtiqAQ"
 }

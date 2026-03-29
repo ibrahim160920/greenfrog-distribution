@@ -92,9 +92,10 @@ bash install.sh --data-dir ~/Applications/GreenFrog
 
 ### Windows
 
-Extract the `.zip` bundle, then **double-click `bootstrap.bat`** — it installs and launches
-in one step. The Windows installer provisions a local Node runtime into the install
-directory and does not depend on your system `node`.
+Extract the `.zip` bundle, then **double-click `bootstrap.bat`**. Windows uses a
+local Node runtime, so the installer does not depend on your system `node`.
+It installs GreenFrog, starts the runtime, waits for `http://127.0.0.1:18889/health`,
+and opens the browser automatically when the local UI is ready.
 
 Or run the installer directly from PowerShell:
 ```powershell
@@ -143,7 +144,7 @@ On first launch, GreenFrog:
 1. Generates a unique local identity (stored in `GreenFrog/identity/`)
 2. Creates a locally-signed credential
 3. Starts the agent runtime at `http://localhost:18889`
-4. Opens the web interface in your browser
+4. Opens the web interface in your browser (automatic when launched via `bootstrap.bat`)
 
 **No server configuration is required.** GreenFrog runs in personal mode by
 default — it initializes itself locally and starts immediately.

@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "releaseId": "fd6b9733-8f22-479b-b9ef-4f7021340954",
+  "releaseId": "59c4f003-f697-48ee-b774-96a3f1e0d949",
   "version": "1.4.0",
-  "releasedAt": "2026-03-29T09:18:41.172Z",
+  "releasedAt": "2026-03-29T10:04:11.702Z",
   "compatibilityConstraint": ">=1.4.0",
   "bundleType": "mother_promoted",
-  "bundleHash": "f0914c112556a0661029c1cdaba34e67d1d6d4423e6681fc08a3b81296fed39f",
-  "bundleSize": 87320904,
+  "bundleHash": "99d0c64b11fce7a29e48ec7c2cabb32fee58d809c64ab59a4f728c070991ceda",
+  "bundleSize": 87321335,
   "downloadUrl": "https://distribution.greenfrog.example.com/v1.4.0/greenfrog-v1.4.0-windows.zip",
   "keyId": "c4ba4d8eeeb0ec21",
-  "signature": "b0vueAzf-ZuU0em3e5cBOf6oYQxUSg_ji6DAz85MSWp5px-v9rzg9RDnTXmIZ3cFwgUIxl_NZjumSB8yaMZIBQ"
+  "signature": "DmQUYCGzCGalXp6znqN7szp9G-AlhjAaG2Pl3UJISobJMRzorrcuOTfs8pFN28aD9vWw-eZmTC_kmfTIsH1GBw"
 }

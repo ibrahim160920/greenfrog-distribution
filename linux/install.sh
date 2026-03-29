@@ -195,7 +195,15 @@ fi
 source "\$CONFIG_FILE" 2>/dev/null || true
 export GF_IS_CHILD_INSTANCE=true
 export GF_BASE_DIR="\${GF_BASE_DIR:-$DATA_DIR}"
-exec node "\$RUNTIME_DIR/index.js" "\$@"
+ENTRY_JS="\$RUNTIME_DIR/entry.js"
+if [ ! -f "\$ENTRY_JS" ]; then
+  echo "ERROR: runtime/entry.js not found in the installed runtime."
+  exit 1
+fi
+if [ \$# -eq 0 ] || [[ "\$1" == -* ]]; then
+  exec node "\$ENTRY_JS" start "\$@"
+fi
+exec node "\$ENTRY_JS" "\$@"
 LAUNCHER
 chmod +x "$LAUNCHER"
 echo "  Launcher created: $LAUNCHER"

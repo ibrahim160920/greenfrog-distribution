@@ -243,11 +243,17 @@ $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dataDir = Split-Path -Parent $scriptDir
 $configPath = Join-Path $dataDir "config.ps1"
-$runtimeEntry = Join-Path $dataDir "runtime\index.js"
+$runtimeEntry = Join-Path $dataDir "runtime\entry.js"
 $bundledNode = Join-Path $dataDir "runtime\node-runtime\node.exe"
 if (-not (Test-Path $bundledNode)) {
     Write-Host
     Write-Host "ERROR: local node-runtime\\node.exe is missing from the GreenFrog install."
+    Write-Host
+    exit 1
+}
+if (-not (Test-Path $runtimeEntry)) {
+    Write-Host
+    Write-Host "ERROR: runtime\\entry.js is missing from the GreenFrog install."
     Write-Host
     exit 1
 }
@@ -261,7 +267,13 @@ if (-not $env:GF_BASE_DIR) {
     $env:GF_BASE_DIR = $dataDir
 }
 
-& $bundledNode $runtimeEntry @ForwardArgs
+$resolvedArgs = @()
+if ($ForwardArgs.Count -eq 0 -or $ForwardArgs[0].StartsWith('-')) {
+    $resolvedArgs += 'start'
+}
+$resolvedArgs += $ForwardArgs
+
+& $bundledNode $runtimeEntry @resolvedArgs
 exit $LASTEXITCODE
 '@ | Set-Content -Encoding UTF8 $launcherPs1Path
 Write-Host "  Launcher created: $launcherPs1Path"
@@ -288,6 +300,7 @@ $bootstrapPath = Join-Path $BinDir "bootstrap.bat"
 rem GreenFrog Bootstrap -- First-Run Launcher
 rem Double-click this file to start GreenFrog.
 title GreenFrog
+setlocal enabledelayedexpansion
 
 echo ============================================================
 echo   GreenFrog
@@ -297,6 +310,10 @@ echo.
 set SCRIPT_DIR=%~dp0
 for %%I in ("%SCRIPT_DIR%..") do set DATA_DIR=%%~fI
 set CONFIG_FILE=%DATA_DIR%\config.ps1
+set "POWERSHELL_EXE=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
+if not exist "%POWERSHELL_EXE%" set "POWERSHELL_EXE=powershell.exe"
+set "APP_URL=http://127.0.0.1:18889/"
+set "HEALTH_URL=http://127.0.0.1:18889/health"
 if not exist "%CONFIG_FILE%" (
     echo   ERROR: GreenFrog is not installed yet.
     echo   Run install.ps1 first.
@@ -304,13 +321,44 @@ if not exist "%CONFIG_FILE%" (
     exit /b 1
 )
 
+call :probe_health
+if !errorlevel! equ 0 (
+    echo   GreenFrog is already running.
+    echo   Opening: %APP_URL%
+    start "" "%APP_URL%"
+    exit /b 0
+)
+
 echo   Starting GreenFrog...
 echo   On first launch, local identity is initialized automatically.
 echo   No server configuration required for personal use.
 echo.
+start "GreenFrog" "%DATA_DIR%\bin\greenfrog.bat"
 
-:launch
-call "%DATA_DIR%\bin\greenfrog.bat"
+echo   Waiting for http://127.0.0.1:18889/ ...
+for /l %%I in (1,1,30) do (
+    call :probe_health
+    if !errorlevel! equ 0 goto :ready
+    >nul timeout /t 1 /nobreak
+)
+
+echo.
+echo   ERROR: GreenFrog did not become reachable within 30 seconds.
+echo   Try running this manually to inspect logs:
+echo     %DATA_DIR%\bin\greenfrog.bat
+echo.
+pause
+exit /b 1
+
+:ready
+echo   GreenFrog is running.
+echo   Opening: %APP_URL%
+start "" "%APP_URL%"
+exit /b 0
+
+:probe_health
+"%POWERSHELL_EXE%" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "try { $r = Invoke-WebRequest -UseBasicParsing -Uri '%HEALTH_URL%' -TimeoutSec 2 -ErrorAction Stop; if ($r.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
+exit /b %ERRORLEVEL%
 "@ | Set-Content -Encoding ASCII $bootstrapPath
 Write-Host "  Bootstrap created: $bootstrapPath"
 Write-Host

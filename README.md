@@ -59,7 +59,7 @@ cd greenfrog-v1.4.0-linux/
 bash install.sh
 ```
 
-For Windows: extract the `.zip` and run `bootstrap.bat` (guided) or `install.ps1`. The Windows installer provisions its own local runtime automatically.
+For Windows: extract the `.zip` and run `bootstrap.bat` (guided). It installs, starts the local runtime, waits for readiness, and opens the browser automatically. The Windows installer provisions its own local runtime automatically.
 
 **Step 3 — Start**
 

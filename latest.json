@@ -1,6 +1,6 @@
 {
   "version": "1.4.0",
-  "releasedAt": "2026-03-29T09:27:45.356Z",
+  "releasedAt": "2026-03-29T10:09:31.909Z",
   "platforms": {
     "linux": {
       "platform": "linux",
@@ -8,7 +8,7 @@
       "filename": "greenfrog-v1.4.0-linux.tar.gz",
       "downloadUrl": null,
       "sha256": "4678e9d071531de2ecd0cbe0c66576bef440961a15162d5f3cf9950f667fbb00",
-      "releasedAt": "2026-03-29T09:27:45.282Z",
+      "releasedAt": "2026-03-29T10:09:31.857Z",
       "bundleExists": true,
       "manifestPath": "manifests/1.4.0/linux.json",
       "signaturePath": "signatures/1.4.0/linux.sig",
@@ -21,7 +21,7 @@
       "filename": "greenfrog-v1.4.0-macos.tar.gz",
       "downloadUrl": null,
       "sha256": "051f9eed2f0c3cf4dc4b7d4c37a71a72349c2a29ab6883b86c78348be0a6344e",
-      "releasedAt": "2026-03-29T09:27:45.313Z",
+      "releasedAt": "2026-03-29T10:09:31.876Z",
       "bundleExists": true,
       "manifestPath": "manifests/1.4.0/macos.json",
       "signaturePath": "signatures/1.4.0/macos.sig",
@@ -34,7 +34,7 @@
       "filename": "greenfrog-v1.4.0-windows.zip",
       "downloadUrl": null,
       "sha256": "27c26617ba503fd55017ee012ed3fd8ff03fad1e6d7832f9f318a967b3676159",
-      "releasedAt": "2026-03-29T09:27:45.346Z",
+      "releasedAt": "2026-03-29T10:09:31.899Z",
       "bundleExists": true,
       "manifestPath": "manifests/1.4.0/windows.json",
       "signaturePath": "signatures/1.4.0/windows.sig",

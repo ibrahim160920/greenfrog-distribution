@@ -74,19 +74,14 @@ if not "%ENROLLMENT_URL%"=="" (
 )
 
 :launch
-echo ============================================================
-echo   Starting GreenFrog...
-echo   On first launch, local identity is initialized automatically.
-echo   Press Ctrl+C to stop.
-echo ============================================================
-echo.
-
-if exist "%DATA_DIR%\bin\greenfrog.bat" (
-    call "%DATA_DIR%\bin\greenfrog.bat"
-) else (
-    set GF_IS_CHILD_INSTANCE=true
-    set GF_BASE_DIR=%DATA_DIR%
-    node "%DATA_DIR%\runtime\index.js"
+if exist "%DATA_DIR%\bin\bootstrap.bat" (
+    call "%DATA_DIR%\bin\bootstrap.bat"
+    exit /b %ERRORLEVEL%
 )
 
+echo.
+echo   ERROR: Installed bootstrap not found at:
+echo     %DATA_DIR%\bin\bootstrap.bat
+echo.
 pause
+exit /b 1

@@ -1,51 +1,10 @@
 {
-  "version": "1.4.1",
-  "releasedAt": "2026-03-30T06:59:36.639Z",
+  "version": "1.4.2",
+  "releaseDate": "2026-03-30T08:30:00.000Z",
   "platforms": {
-    "linux": {
-      "platform": "linux",
-      "version": "1.4.1",
-      "filename": "greenfrog-v1.4.1-linux.tar.gz",
-      "downloadUrl": null,
-      "sha256": "9e058f8b3cc583f37efa6e5ead40e0342768bfdef92fcbe1cd58c225b309f443",
-      "releasedAt": "2026-03-30T06:59:36.639Z",
-      "bundleExists": true,
-      "manifestPath": "manifests/1.4.1/linux.json",
-      "signaturePath": "signatures/1.4.1/linux.sig",
-      "installScript": "linux/install.sh",
-      "bootstrapScript": null
-    },
-    "macos": {
-      "platform": "macos",
-      "version": "1.4.1",
-      "filename": "greenfrog-v1.4.1-macos.tar.gz",
-      "downloadUrl": null,
-      "sha256": "1f31c3d3ef6857091dcbd9e11a604535364c78d3a5f460e6150d37815df14b21",
-      "releasedAt": "2026-03-30T06:59:36.639Z",
-      "bundleExists": true,
-      "manifestPath": "manifests/1.4.1/macos.json",
-      "signaturePath": "signatures/1.4.1/macos.sig",
-      "installScript": "macos/install.sh",
-      "bootstrapScript": null
-    },
-    "windows": {
-      "platform": "windows",
-      "version": "1.4.1",
-      "filename": "greenfrog-v1.4.1-windows.zip",
-      "downloadUrl": null,
-      "sha256": "3dee02e04efdfec75d99ba511c001ec1933927c5dc343e0772408b20a206b6cd",
-      "releasedAt": "2026-03-30T06:59:36.639Z",
-      "bundleExists": true,
-      "manifestPath": "manifests/1.4.1/windows.json",
-      "signaturePath": "signatures/1.4.1/windows.sig",
-      "installScript": "windows/install.ps1",
-      "bootstrapScript": "windows/bootstrap.bat"
-    }
+    "linux":   { "file": "linux/greenfrog-v1.4.2-linux.tar.gz",   "sha256": "b1c143350d8dfa35faf20626b89ed7f384b6fb7bfc3f585b96df045e1ab030dd" },
+    "macos":   { "file": "macos/greenfrog-v1.4.2-macos.tar.gz",   "sha256": "f6ffd4474d9ddec0a8672ebfcf92b4ef7e2b008df6960f4d4b33788037c1a625" },
+    "windows": { "file": "windows/greenfrog-v1.4.2-windows.zip",  "sha256": "cda4e74e343fe03ca08de88e8b0800ca08524d392a5d7dfd8033613ffd272bcf" }
   },
-  "manifestBase": "manifests/1.4.1",
-  "signatureBase": "signatures/1.4.1",
-  "publicKey": "public-key.pem",
-  "installDocs": "docs/install.md",
-  "upgradeDocs": "docs/upgrade.md",
-  "verificationDocs": "docs/signature-verification.md"
+  "releaseNotes": "Fix: login page auto-fills token for all localhost installs. Fix: multi-turn assistant messages use correct output_text encoding."
 }

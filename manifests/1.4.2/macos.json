@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "releaseId": "affa3599-212e-42d4-9936-53971ab25b59",
+  "version": "1.4.2",
+  "releasedAt": "2026-03-30T08:28:58.514Z",
+  "compatibilityConstraint": ">=1.4.2",
+  "bundleType": "mother_promoted",
+  "bundleHash": "f6ffd4474d9ddec0a8672ebfcf92b4ef7e2b008df6960f4d4b33788037c1a625",
+  "bundleSize": 76724121,
+  "downloadUrl": "https://distribution.greenfrog.example.com/v1.4.2/greenfrog-v1.4.2-macos.tar.gz",
+  "keyId": "c4ba4d8eeeb0ec21",
+  "signature": "qQ-RGvdUXkNJpLP4JIKczTJz6LXvxLKz7WIbAVsNduUZSlydKuNN16NTaItDq-0jNYS_j8OCTFQNLMy_dBQpBQ"
+}

@@ -1,10 +1,10 @@
 {
-  "version": "1.4.2",
-  "releaseDate": "2026-03-30T08:30:00.000Z",
+  "version": "1.4.3",
+  "releaseDate": "2026-03-30T12:00:00.000Z",
   "platforms": {
-    "linux":   { "file": "linux/greenfrog-v1.4.2-linux.tar.gz",   "sha256": "b1c143350d8dfa35faf20626b89ed7f384b6fb7bfc3f585b96df045e1ab030dd" },
-    "macos":   { "file": "macos/greenfrog-v1.4.2-macos.tar.gz",   "sha256": "f6ffd4474d9ddec0a8672ebfcf92b4ef7e2b008df6960f4d4b33788037c1a625" },
-    "windows": { "file": "windows/greenfrog-v1.4.2-windows.zip",  "sha256": "cda4e74e343fe03ca08de88e8b0800ca08524d392a5d7dfd8033613ffd272bcf" }
+    "linux":   { "file": "linux/greenfrog-v1.4.3-linux.tar.gz",   "sha256": "6a20549e6e804aaf5ce9d767f5315cdc0d68f2eb70c6252ba964eb1329d4b65c" },
+    "macos":   { "file": "macos/greenfrog-v1.4.3-macos.tar.gz",   "sha256": "200f343f35ad700746881167da2405ee8a99865abf4e264f686d984b4061b278" },
+    "windows": { "file": "windows/greenfrog-v1.4.3-windows.zip",  "sha256": "d18fdbc1ef3a581e9a1b0e32371398b4b5e18b97bd65614b9728cfc91293abd2" }
   },
-  "releaseNotes": "Fix: login page auto-fills token for all localhost installs. Fix: multi-turn assistant messages use correct output_text encoding."
+  "releaseNotes": "Fix: child install projectPath security root now allows <install-root>/projects/** as task working directory. Installer creates projects/ folder automatically. process.cwd() excluded from safe roots in child install mode."
 }

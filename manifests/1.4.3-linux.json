@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "releaseId": "3f6d23a6-6867-48cb-b923-cb2172a63b79",
+  "version": "1.4.3",
+  "releasedAt": "2026-03-30T11:19:08.487Z",
+  "compatibilityConstraint": ">=1.4.3",
+  "bundleType": "mother_promoted",
+  "bundleHash": "6a20549e6e804aaf5ce9d767f5315cdc0d68f2eb70c6252ba964eb1329d4b65c",
+  "bundleSize": 76726703,
+  "downloadUrl": "https://distribution.greenfrog.example.com/v1.4.3/greenfrog-v1.4.3-linux.tar.gz",
+  "keyId": "c4ba4d8eeeb0ec21",
+  "signature": "lKselB6hDfvN1lSQ04qcFHTcUpHFYih98b-nnkNM3Csw75Bf1YJcS2KSWpab4RxaIUEiMy5Cge9fRT41ysQXCQ"
+}
